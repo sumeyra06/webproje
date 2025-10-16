@@ -408,6 +408,13 @@ async function openInvoiceForEdit(inv) {
       let unitVal = it.unit || 'Adet';
       let priceVal = parseNumberLoose(it.price);
       let taxVal = parseNumberLoose(it.tax);
+      if (!Number.isFinite(priceVal)) {
+        const lt = parseNumberLoose(it.lineTotal);
+        const q = parseNumberLoose(it.qty);
+        if (Number.isFinite(lt) && Number.isFinite(q) && q > 0) {
+          priceVal = lt / q;
+        }
+      }
       if (it.product_id && PRODUCTS_CACHE) {
         const p = PRODUCTS_CACHE.find(x => x.id === it.product_id);
         if (p) {
