@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AKSA YAZILIM | Yönetici Girişi</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+            /* Auth page layout */
+                    body.auth-page {
+                        min-height: 100vh;
+                        margin: 0;
+                        background: radial-gradient(1200px 520px at 50% 0%, #121826, #0e1217 60%);
+                        display:flex;
+                    }
+                    .auth-wrapper {
+                        display:grid;
+                        grid-template-columns: 1fr;
+                        place-items: center;
+                        width:100%;
+                        min-height: 100vh;
+                        padding: 16px 0;
+                    }
+                    .auth-left { display:none; }
+                            .auth-right {
+                                display:grid;
+                                align-content: center;
+                                justify-items: center;
+                                gap: 18px;
+                                padding: 12px 18px;
+                                width: 100%;
+                                max-width: 880px;
+                                margin: 0 auto;
+                            }
+                    .auth-hero { padding: 0 8px; display:flex; align-items:center; justify-content:center; text-align:center; }
+                    .auth-hero-inner { width: 92%; max-width: 740px; margin: 0 auto; }
+                    /* Improve contrast on dark bg */
+                    .auth-hero .eleks-logo { color: #ffffff !important; text-shadow: 0 1px 2px rgba(0,0,0,0.55); }
+                    .auth-hero .auth-brand { color: #f59e0b !important; text-shadow: 0 1px 2px rgba(0,0,0,0.55); }
+                    .auth-hero .auth-tagline { color: #cbd5e1 !important; text-shadow: 0 1px 2px rgba(0,0,0,0.55); }
+                    .auth-point { text-shadow: 0 1px 2px rgba(0,0,0,0.55); }
+                    .auth-points .auth-point:nth-child(1) { color: #16a34a !important; }
+                    .auth-points .auth-point:nth-child(2) { color: #2563eb !important; }
+                    .auth-points .auth-point:nth-child(3) { color: #7c3aed !important; }
+                    .auth-point i { color: currentColor !important; }
+      .auth-brand { font-size: 2.2rem; font-weight: 900; letter-spacing:-1px; text-transform: uppercase; color:#181818; margin-bottom: 18px; }
+      .auth-tagline { font-size: 1.2rem; color: #444; margin-bottom: 26px; }
+    .auth-points { display:grid; gap:10px; justify-items: center; text-align: center; }
+    .auth-point { display:flex; align-items:center; justify-content: center; gap:10px; color:#222; }
+      .auth-point i { color:#ff6f00; }
+    .auth-card-side { background: transparent; display:flex; align-items:center; justify-content:center; padding: 0; position: relative; width:100%; }
+    .auth-card { width: 96%; max-width: 560px; background:#fff; border-radius: 16px; box-shadow: 0 16px 48px rgba(0,0,0,0.12); padding: 32px 28px; margin: 0 auto; }
+    .auth-card h2 { margin: 0 0 8px 0; font-size: 1.6rem; font-weight: 900; letter-spacing: -0.6px; text-align:center; }
+    .auth-card p { margin: 0 0 14px 0; color:#555; text-align:center; }
+    .auth-form { display:grid; gap: 12px; }
+    .auth-form .form-row { display:grid; grid-template-columns: 1fr; gap: 8px; align-items:center; }
+    .auth-form label { font-size: 0.95rem; font-weight: 700; color:#333; text-align:center; }
+    .auth-form input { padding: 14px; border: 1px solid #e6e6ee; border-radius: 12px; font-size: 1rem; background: #ffffff; width: 100%; }
+    /* Center form rows and actions relative to texts */
+    .auth-form { justify-items: center; }
+    .auth-form .form-row { max-width: 560px; width: 100%; }
+    .auth-actions { max-width: 560px; width: 100%; margin-left: auto; margin-right: auto; }
+    .auth-submit { max-width: 560px; display: block; margin-left: auto; margin-right: auto; }
+    .auth-actions { display:flex; align-items:center; justify-content:center; gap: 12px; margin-top: 4px; }
+      .auth-remember { display:flex; align-items:center; gap:8px; font-size: 0.95rem; color:#444; }
+      .auth-submit { width: 100%; margin-top: 6px; padding: 12px; border-radius: 12px; border:none; font-weight: 800; font-size:1.05rem; cursor:pointer; background: linear-gradient(90deg, #ffd600 0%, #ff6f00 100%); color:#181818; }
+      .auth-submit:hover { background: linear-gradient(90deg, #ff6f00 0%, #ffd600 100%); color:#fff; }
+            .auth-home-btn { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap:8px; margin-top: 8px; padding: 11px 14px; border-radius: 12px; border: 1px solid #e6e6ee; background:#ffffff; font-weight: 800; font-size:1.02rem; color:#181818; text-decoration: none; }
+            .auth-home-btn:hover { background:#f8f9fb; border-color:#ffd600; color:#ff6f00; text-decoration:none; }
+      .auth-links { display:flex; justify-content:space-between; margin-top: 10px; }
+      .auth-links a { color:#444; font-weight:700; text-decoration:none; }
+      .auth-links a:hover { color:#ff6f00; text-decoration: underline; }
+      .login-error { color:#ff6f00; font-weight: 700; margin-top: 8px; display:none; }
+      .auth-footer { margin-top: 12px; font-size: 0.95rem; color:#666; text-align:center; }
+      .auth-footer a { color:#181818; font-weight:800; text-decoration:none; }
+      .auth-footer a:hover { color:#ff6f00; text-decoration:underline; }
+      .eleks-logo { font-size: 2.2rem; }
+      .eleks-logo .dot { color: #ff6f00; font-size: 2.4rem; margin-left: 2px; }
+            @media (max-width: 900px) {
+        .auth-wrapper { grid-template-columns: 1fr; }
+        .auth-right { padding: 18px 10px; }
+        .auth-card-side { padding: 0; }
+        .auth-hero { padding: 12px 10px; text-align:center; }
+        .auth-brand { text-align:center; }
+        .auth-tagline { text-align:center; }
+                .auth-form .form-row { grid-template-columns: 1fr; }
+                .auth-form label { text-align:left; }
+      }
+            /* Video embed */
+            .auth-video { margin-top: 22px; }
+            .video-frame { position: relative; width: 100%; padding-top: 56.25%; border-radius: 14px; overflow: hidden; box-shadow: 0 8px 28px rgba(0,0,0,0.12); }
+            .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+            /* Rotating quotes */
+            .auth-quotes { margin-top: 18px; background: #fff; border: 1px solid #f0f0f0; border-radius: 12px; padding: 12px 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+            .auth-quotes .quote { font-style: italic; color:#222; }
+            .auth-quotes .author { color:#666; font-weight:700; margin-top: 6px; display:block; }
+            /* Center white background blocks */
+            .auth-quotes { max-width: 740px; margin-left:auto; margin-right:auto; text-align:center; }
+            .auth-form .form-row input { max-width: 420px; justify-self: center; }
+            .auth-actions { max-width: 420px; }
+            .auth-submit { max-width: 420px; }
+            .auth-home-btn { max-width: 420px; }
+    </style>
+</head>
+<body class="auth-page">
+    <div class="auth-wrapper">
+    <div class="auth-right">
+        <section class="auth-hero">
+            <div class="auth-hero-inner">
+                <div class="eleks-logo">AKSA YAZILIM<span class="dot">.</span></div>
+                <h1 class="auth-brand">Ön Muhasebe Platformu</h1>
+                                <p class="auth-tagline">Tekliften faturaya, cariden tahsilata. İşletmenizin finans akışını güvenle yönetin.</p>
+                <div class="auth-points">
+                    <div class="auth-point"><i class="bi bi-shield-check"></i> KVKK uyumlu ve güvenli</div>
+                    <div class="auth-point"><i class="bi bi-speedometer"></i> Hızlı, modern arayüz</div>
+                    <div class="auth-point"><i class="bi bi-cloud-arrow-up"></i> Bulut tabanlı altyapı</div>
+                </div>
+                                
+                                <div class="auth-quotes">
+                                    <div id="quoteText" class="quote">Rakamlar asla yalan söylemez ama onları takip etmeyen insanlar kendi kendine yalan söyler.</div>
+                                    <span id="quoteAuthor" class="author">— Peter Drucker</span>
+                                </div>
+            </div>
+        </section>
+        <aside class="auth-card-side">
+            <div class="auth-card">
+                <h2>Giriş Yapın</h2>
+                <p>E-posta ve şifrenizle giriş yapın</p>
+                <form id="userLoginForm" class="auth-form" autocomplete="on">
+                    <div class="form-row">
+                        <label for="loginEmail">E-posta</label>
+                        <input type="email" id="loginEmail" name="email" placeholder="eposta@ornek.com" required />
+                    </div>
+                    <div class="form-row">
+                        <label for="loginPassword">Şifre</label>
+                        <input type="password" id="loginPassword" name="password" placeholder="••••••••" required />
+                    </div>
+                    <div class="auth-actions">
+                        <label class="auth-remember"><input type="checkbox" id="rememberMe" /> Beni hatırla</label>
+                        <a href="#" style="font-weight:700;color:#444;text-decoration:none;">Şifremi unuttum</a>
+                    </div>
+                    <button type="submit" class="auth-submit">Giriş Yap</button>
+                    <a href="index.html" class="auth-home-btn" title="Ana sayfaya dön">
+                        <i class="bi bi-house-door"></i>
+                        Ana sayfaya dön
+                    </a>
+                    <div id="userLoginError" class="login-error"></div>
+                    <div id="unauthMsg" class="login-error" style="display:none;">Bu sayfayı görüntülemek için yönetici yetkisi gerekir.</div>
+                </form>
+                <div class="auth-footer">
+                    Henüz hesabınız yok mu? <a href="signup.html">Üye Ol</a>
+                </div>
+            </div>
+        </aside>
+        </div>
+    </div>
+                <!-- Optional runtime env overrides (copy env.example.js -> env.local.js) -->
+                <script src="./env.local.js"></script>
+                <script type="module">
+                        import { supabase } from './supabaseClient.js';
+                        const form = document.getElementById('userLoginForm');
+                        const errorDiv = document.getElementById('userLoginError');
+                        const unauthMsg = document.getElementById('unauthMsg');
+
+                        // Show unauthorized message if redirected from protected page
+                        try {
+                            const params = new URLSearchParams(window.location.search);
+                            if (params.get('unauthorized') === '1') {
+                                unauthMsg.style.display = 'block';
+                            }
+                        } catch {}
+
+                        // Client-side SHA-256 to match signup hashing (Note: for production, prefer server-side auth)
+                        const hashPassword = async (plain) => {
+                            const enc = new TextEncoder().encode(plain);
+                            const buf = await crypto.subtle.digest('SHA-256', enc);
+                            const arr = Array.from(new Uint8Array(buf));
+                            return arr.map(b => b.toString(16).padStart(2, '0')).join('');
+                        };
+
+                        form.onsubmit = async function(e) {
+                                e.preventDefault();
+                                const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+                                const password = document.getElementById('loginPassword').value;
+                                errorDiv.style.display = 'none';
+
+                                try {
+                                    const password_hash = await hashPassword(password);
+                                    // Query the users table with RLS allowing only self matching rows
+                                    let { data: user, error } = await supabase
+                                        .from('users')
+                                        .select('id, email, role, full_name, company_title, phone, is_active')
+                                        .eq('email', email)
+                                        .eq('password_hash', password_hash)
+                                        .single();
+                                    if (error && error.message && error.message.toLowerCase().includes('is_active')) {
+                                        console.warn('is_active sütunu bulunamadı, aktiflik kontrolü atlanıyor.');
+                                        const resp = await supabase
+                                            .from('users')
+                                            .select('id, email, role, full_name, company_title, phone')
+                                            .eq('email', email)
+                                            .eq('password_hash', password_hash)
+                                            .single();
+                                        user = resp.data; error = resp.error;
+                                    } else if (!error) {
+                                        if (user && user.is_active === false) {
+                                            throw new Error('Hesap pasif. Lütfen yönetici ile iletişime geçin.');
+                                        }
+                                    }
+                                    if (error || !user) throw error || new Error('Giriş bilgileri hatalı');
+
+                                    // Persist minimal session in localStorage (client-side only)
+                                    try { localStorage.setItem('sessionUser', JSON.stringify(user)); } catch {}
+
+                                    // Remember me stores only the email hint
+                                    const remember = document.getElementById('rememberMe').checked;
+                                    if (remember) { try { localStorage.setItem('rememberEmail', email); } catch {} }
+
+                                                                            // Her kullanıcıyı panele al; sayfa yetkisini panel içinde kısıtla
+                                                                            window.location.href = 'admin-panel.html';
+                                } catch (err) {
+                                    console.error('login error', err);
+                                    errorDiv.textContent = 'E-posta veya şifre hatalı.';
+                                    errorDiv.style.display = 'block';
+                                }
+                        };
+
+                        // Optional: prefill email from remember
+                        try {
+                            const rememberEmail = localStorage.getItem('rememberEmail');
+                            if (rememberEmail) document.getElementById('loginEmail').value = rememberEmail;
+                        } catch {}
+
+                        // RLS Policy Notes:
+                        // - Allow INSERT into users for anon role to enable signup.
+                        // - Allow SELECT on users where email = auth email and password_hash matches provided filter (or via RPC) to enable login.
+                        // Consider moving to Supabase Auth for production security.
+                </script>
+                <script>
+                    // Rotating finance quotes
+                    const quotes = [
+                        { q: 'Rakamlar asla yalan söylemez ama onları takip etmeyen insanlar kendi kendine yalan söyler. Bütçeni izle.', a: 'Anonim' },
+                        { q: 'Ölçemediğini yönetemezsin.', a: 'Peter Drucker' },
+                        { q: 'Nakit kraldır; nakit akışı oksijendir.', a: 'Anonim' },
+                        { q: 'Bütçe, stratejinin sayısal ifadesidir.', a: 'Jack Welch' },
+                        { q: 'Kâr, alışkanlıkların sonucudur; nakit, disiplinin.', a: 'Anonim' },
+                        { q: 'Geliri kovalamak yerine gideri kontrol et.', a: 'Warren Buffett' },
+                        { q: 'Her TL’nin nereye gittiğini bil; sürpriz kalmasın.', a: 'Anonim' },
+                        { q: 'Küçük tasarruflar büyük özgürlükler getirir.', a: 'Anonim' },
+                        { q: 'Plan yoksa, risk yönetimi de yoktur.', a: 'Anonim' }
+                    ];
+                    let qi = 0;
+                    const qt = document.getElementById('quoteText');
+                    const qa = document.getElementById('quoteAuthor');
+                    function rotateQuote() {
+                        qi = (qi + 1) % quotes.length;
+                        const { q, a } = quotes[qi];
+                        qt.textContent = q;
+                        qa.textContent = `— ${a}`;
+                    }
+                    setInterval(rotateQuote, 10000);
+                </script>
+</body>
+</html>

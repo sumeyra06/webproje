@@ -1,0 +1,770 @@
+/* Ürünler tablosu için basit stiller */
+.admin-sidebar .admin-logo {
+    background: #000; /* koyu arka plan */
+    color: #f3f4f6;   /* açık metin */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    white-space: nowrap; /* tek satırda kalsın */
+}
+/* logo solda, biraz büyük */
+
+/* Düz CSS ile koyu yan menü düzeni */
+body { font-family: 'Inter', Arial, sans-serif; }
+.admin-sidebar {
+    background: #111;
+    min-width: 220px;
+    max-width: 260px;
+    border-right: 1px solid #222;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+    .admin-logo {
+        background: #111;
+        color: #00bfff;
+        .admin-sidebar .admin-logo .brand-title {
+             font-weight: 800;
+             font-size: 1.2rem; /* biraz daha büyük */
+             letter-spacing: 0.2px;
+             color: #f5f7fa; /* beyaza yakın, hafif kırık */
+             text-transform: lowercase;
+        font-weight: 800;
+        font-size: 1.18rem;
+        padding: 18px 0 12px 24px;
+        border-bottom: 1px solid #222;
+        letter-spacing: 1px;
+    }
+        .admin-sidebar .admin-logo .brand-subtitle {
+             font-weight: 600;
+             font-size: 0.88rem;
+             color: #d6dde5; /* biraz daha koyu */
+        }
+    /* Accordion başlıkları için daha sade görünüm */
+    #salesAccordionToggle, #stockAccordionToggle, #expensesAccordionToggle {
+        font-size: 1.08rem !important;
+        font-weight: 700;
+        color: inherit !important;
+        background: none;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.18s;
+        display: block;
+    }
+    #salesAccordionToggle:hover, #stockAccordionToggle:hover, #expensesAccordionToggle:hover {
+        background: #222;
+    }
+    /* Accordion içerikleri */
+    #salesAccordion, #stockAccordion, #expensesAccordion {
+        background: none;
+        padding-left: 8px;
+    }
+/* Top dark header (navbar) */
+.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1200; width: 100%; background: #0f172a; color: #e5e7eb; display: flex; align-items: center; justify-content: center; padding: 10px 18px; box-shadow: 0 2px 16px rgba(0,0,0,0.35); height: 56px; }
+.topbar .topbar-left { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 10px; }
+/* topbar-left intentionally left empty for optional brand/logo */
+.topbar .topbar-right { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 10px; }
+/* User chip */
+.topbar .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.12);
+    color: #f3f4f6;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+.topbar .chip i { color: #93c5fd; }
+.topbar .chip .chip-text { max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar #logout-btn { color: #fff; box-shadow: 0 1px 6px rgba(220,38,38,0.35); }
+.topbar #logout-btn:hover { filter: brightness(1.05); box-shadow: 0 2px 10px rgba(220,38,38,0.5); }
+.topbar #support-btn.btn-warning { color: #1f2937; font-weight: 600; }
+.topbar #support-btn.btn-warning i { color: inherit; }
+/* Ürünler grid/kart görünümü */
+.products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 24px;
+}
+.product-row {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    padding: 14px 18px;
+    gap: 18px;
+    min-height: 110px;
+}
+.product-row-image {
+    width: 90px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f7f7f7;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.product-row-image img {
+    max-width: 100%;
+    max-height: 80px;
+    border-radius: 8px;
+}
+.product-row-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.product-row-title {
+    font-size: 1.01rem;
+    font-weight: 600;
+    color: #222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.product-row-meta {
+    font-size: 0.89rem;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.product-row-desc {
+    font-size: 0.92rem;
+    color: #555;
+    max-height: 32px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.product-row-price-stock {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    min-width: 70px;
+}
+.product-row-price {
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #fff;
+    background: #ff9800;
+    border-radius: 8px;
+    padding: 4px 14px;
+    box-shadow: 0 2px 8px rgba(255,152,0,0.08);
+}
+.product-row-stock {
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #fff;
+    background: #009688;
+    border-radius: 8px;
+    padding: 4px 14px;
+    box-shadow: 0 2px 8px rgba(0,150,136,0.08);
+}
+.compact-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+.compact-card {
+    padding: 10px 10px 8px 10px;
+    min-height: 220px;
+    max-width: 220px;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+}
+.compact-card .product-image {
+    height: 90px;
+    margin-bottom: 8px;
+}
+.compact-card .product-title {
+    font-size: 0.93rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 6px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+.compact-card .product-price-stock {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+.compact-card .product-price {
+    background: #ff9800;
+    border-radius: 8px;
+    padding: 2px 8px;
+    color: #fff;
+}
+.compact-card .product-stock {
+    background: #009688;
+    border-radius: 8px;
+    padding: 2px 8px;
+    color: #fff;
+}
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+.product-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    padding: 18px 18px 14px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+.product-card:hover {
+    box-shadow: 0 8px 32px rgba(255,214,0,0.13);
+    transform: translateY(-4px) scale(1.03);
+}
+.product-image {
+    width: 100%;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+.product-image img {
+    max-width: 100%;
+    max-height: 140px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(255,214,0,0.08);
+}
+.no-image {
+    color: #bbb;
+    font-size: 1.1rem;
+}
+.product-title {
+                    font-size: 0.97rem;
+                    font-weight: 600;
+                    color: #222;
+                    margin-bottom: 6px;
+                    max-width: 100%;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    word-break: break-word;
+}
+.product-desc {
+        font-size: 0.92rem;
+        color: #555;
+        margin-bottom: 6px;
+        min-height: 24px;
+        max-height: 38px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+}
+.product-meta {
+        font-size: 0.88rem;
+        color: #888;
+        margin-bottom: 4px;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+.product-price-stock {
+                font-size: 0.97rem;
+                font-weight: 700;
+                color: #fff;
+                margin-bottom: 8px;
+                display: flex;
+                gap: 10px;
+                margin-top: -2px;
+}
+            font-weight: 700;
+            color: #fff;
+            background: #009688;
+            border-radius: 8px;
+            padding: 3px 12px;
+            font-size: 0.97rem;
+            box-shadow: 0 2px 8px rgba(0,150,136,0.08);
+}
+            font-weight: 700;
+            color: #fff;
+            background: #ff9800;
+            border-radius: 8px;
+            padding: 3px 12px;
+            font-size: 0.97rem;
+            box-shadow: 0 2px 8px rgba(255,152,0,0.08);
+}
+.product-link {
+    display: inline-block;
+    margin-top: 6px;
+        font-size: 0.92rem;
+        color: #888;
+        margin-bottom: 4px;
+        display: none;
+    padding: 6px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.product-link:hover {
+    background: linear-gradient(90deg, #ff6f00 0%, #ffd600 100%);
+    color: #181818;
+}
+/* Modern ve kurumsal tablo görünümü */
+.admin-table th {
+    background: #f9f9f9;
+    font-weight: 700;
+    color: #333;
+    border-bottom: 2px solid #ffd600;
+}
+
+/* --- Sidebar koyu tema son düzenlemeler (override) --- */
+.admin-layout .admin-sidebar {
+    background: #0b0b0b !important;
+    border-right: 1px solid #222 !important;
+}
+.admin-layout .admin-sidebar .admin-logo {
+    background: #000 !important;
+    color: #f3f4f6 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* ortala */
+    gap: 10px;
+    padding: 14px 16px !important; /* biraz daha ferah */
+    margin: 0 !important;
+}
+.admin-layout .admin-sidebar .admin-logo .brand-logo {
+    width: 20px !important; /* biraz daha küçült */
+    height: 20px !important;
+    flex: 0 0 20px !important;
+}
+.admin-layout .admin-sidebar .admin-logo .brand-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* ortala */
+    text-align: center;  /* ortala */
+    line-height: 1.08;
+}
+.admin-layout .admin-sidebar .admin-logo .brand-stack .brand-line {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+.admin-layout .admin-sidebar .admin-logo .panel-title {
+    font-size: 0.9rem; /* biraz büyüt */
+    opacity: 0.95;
+    margin-top: 3px;
+    color: #f59e0b !important; /* turuncu */
+}
+.admin-layout .admin-sidebar .admin-logo .brand-name {
+    font-size: 1rem; /* marka adını az büyüt */
+}
+.admin-layout .admin-sidebar .admin-logo .brand-name { color: #f3f4f6 !important; font-weight: 800; }
+/* panel-title rengi turuncu olmalı; aşağıdaki satır kaldırıldı */
+/*.admin-layout .admin-sidebar .admin-logo .panel-title { color: #e5e7eb !important; }*/
+.admin-layout .admin-sidebar .admin-logo .dot { color: #60a5fa !important; }
+
+/* Alt başlıklar (accordion) ve içerikleri de koyu arka plan */
+.admin-layout .admin-sidebar .accordion-item,
+.admin-layout .admin-sidebar .accordion-collapse,
+.admin-layout .admin-sidebar .accordion-body { background: #0b0b0b !important; border: 0; }
+.admin-layout .admin-sidebar .accordion-button {
+    background: #0b0b0b !important;
+    color: #e5e7eb !important;
+    box-shadow: none !important;
+}
+.admin-layout .admin-sidebar .accordion-button:not(.collapsed) {
+    background: #111 !important;
+    color: #ffffff !important;
+}
+.admin-layout .admin-sidebar .accordion-button::after { filter: invert(1) brightness(1.2); }
+
+.admin-layout .admin-sidebar .accordion-body .nav-link { color: #d1d5db !important; }
+.admin-layout .admin-sidebar .accordion-body .nav-link:hover {
+    color: #ffffff !important;
+    background: rgba(255,255,255,0.06) !important;
+}
+.admin-table tr:nth-child(even) {
+    background: #f7f7f7;
+}
+.admin-table tr {
+    transition: background 0.2s;
+}
+.admin-table tr:hover {
+    background: #fffde7 !important;
+}
+.admin-table td {
+    vertical-align: middle;
+    border-bottom: 1px solid #eee;
+}
+.admin-table img {
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(255,214,0,0.08);
+    background: #fff;
+    padding: 2px;
+    max-width: 60px;
+    max-height: 60px;
+}
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+}
+.admin-table th, .admin-table td {
+    border: 1px solid #e0e0e0;
+    padding: 12px 10px;
+    text-align: left;
+    font-size: 1.04rem;
+    vertical-align: middle;
+}
+.admin-table th {
+    background: linear-gradient(90deg, #ffd600 0%, #ff6f00 100%);
+    color: #181818;
+    font-weight: 700;
+    font-size: 1.08rem;
+    letter-spacing: 0.5px;
+}
+.admin-table tr:nth-child(even) {
+    background: #fff8e1;
+}
+/* Sidebar ve Layout */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+/* Content below fixed topbar: shift only the main area, keep background flush to top */
+/* Removed padding on .admin-layout to let the page background reach the top */
+
+/* Ensure main content starts below the fixed topbar */
+.admin-main { margin-top: 56px; }
+.admin-sidebar {
+    width: 270px;
+    background: #f8f9fa;
+    border-right: 1px solid #e9ecef;
+    min-height: calc(100vh - 56px); /* leave room for fixed topbar */
+    position: sticky;
+    top: 56px; /* sit below the topbar */
+    z-index: 20;
+    padding: 0 0 24px 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    display: block;
+    overflow: auto; /* make sidebar scrollable if long */
+}
+.admin-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0d6efd;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 24px 24px 12px 24px;
+    margin-bottom: 0;
+    background: #fff;
+    border-bottom: 1px solid #e9ecef;
+}
+.admin-nav {
+    display: block;
+    width: 100%;
+    margin: 0;
+}
+.admin-nav-link {
+    color: #212529;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 10px 18px;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+    width: 100%;
+    margin: 0;
+    display: block;
+}
+.admin-nav-link:hover, .admin-nav-link.active {
+    background: #e2e6ea;
+    color: #0d6efd;
+}
+.admin-nav-group span {
+    font-size: 1.08rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #00bfff;
+    letter-spacing: 0.5px;
+    display: block;
+}
+.admin-nav-group .panel-icon {
+    font-size: 1.08rem;
+    margin-right: 4px;
+    color: #f3f3f3;
+    vertical-align: middle;
+}
+.panel-title {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #6c757d;
+    margin-left: 12px;
+}
+.admin-layout main#adminMain {
+    flex: 1;
+    max-width: 100vw;
+    margin: 40px auto;
+    background: #222;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+    padding: 40px 32px 32px 32px;
+    min-height: 400px;
+}
+@media (max-width: 900px) {
+    .admin-layout {
+        flex-direction: column;
+    }
+    .admin-sidebar {
+        width: 100vw;
+        min-height: unset;
+        flex-direction: row;
+        align-items: center;
+        border-right: none;
+        border-bottom: 1.5px solid #f2f2f2;
+        padding: 16px 0 0 0;
+        position: static;
+    }
+    .admin-nav {
+        flex-direction: row;
+        gap: 8px;
+        margin-left: 16px;
+    }
+    .admin-nav-link {
+        border-radius: 8px;
+        width: unset;
+        padding: 8px 12px;
+    }
+    .admin-logo {
+        margin-left: 16px;
+        margin-bottom: 0;
+        font-size: 1.3rem;
+    }
+    .admin-layout main#adminMain {
+        margin: 16px auto;
+        padding: 18px 8px 18px 8px;
+    }
+}
+.dashboard-section {
+    margin-bottom: 40px;
+}
+.dashboard-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    margin-bottom: 32px;
+    color: #181818;
+    letter-spacing: -1px;
+    text-align: left;
+}
+.dashboard-cards {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+}
+.dashboard-card {
+    background: linear-gradient(90deg, #ffd600 0%, #ff6f00 100%);
+    color: #181818;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    padding: 32px 36px;
+    min-width: 180px;
+    flex: 1 1 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    transition: box-shadow 0.2s, transform 0.2s;
+    cursor: pointer;
+}
+.dashboard-card:hover {
+    box-shadow: 0 8px 32px rgba(255,111,0,0.13);
+    transform: translateY(-4px) scale(1.03);
+}
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #ff6f00;
+    letter-spacing: 0.5px;
+}
+.card-value {
+    font-size: 2.1rem;
+    font-weight: 900;
+    color: #181818;
+}
+@media (max-width: 900px) {
+    .dashboard-cards {
+        flex-direction: column;
+        gap: 18px;
+    }
+    .dashboard-card {
+        min-width: unset;
+        width: 100%;
+    }
+}
+body {
+    margin: 0;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #181818;
+    color: #f3f3f3;
+}
+.admin-header {
+    background: #fff;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    padding: 24px 0 18px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.admin-logo {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #181818;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    margin-left: 32px;
+}
+.admin-logo .dot {
+    color: #ff6f00;
+    font-size: 2.5rem;
+    vertical-align: middle;
+}
+.panel-title {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #888;
+    margin-left: 18px;
+}
+.admin-nav {
+    display: flex;
+    gap: 24px;
+    margin-right: 32px;
+}
+.admin-nav-link {
+    color: #181818;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.08rem;
+    position: relative;
+    transition: color 0.2s;
+    padding: 2px 0;
+}
+.admin-nav-link:hover, .admin-nav-link.active {
+    color: #ff6f00;
+}
+#adminMain {
+    max-width: 800px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    padding: 40px 32px 32px 32px;
+    min-height: 400px;
+}
+
+/* Coming Soon card */
+.coming-soon-card {
+    background: linear-gradient(180deg, #ffffff 0%, #fffdf5 100%);
+    border: 1px solid #f2f2f2;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+    padding: 32px 24px;
+    text-align: center;
+    max-width: 680px;
+    margin: 16px auto;
+}
+.coming-soon-card .cs-icon { font-size: 2.4rem; color: #ff6f00; margin-bottom: 8px; }
+.coming-soon-card .cs-title { font-size: 1.6rem; font-weight: 900; margin: 0 0 6px 0; letter-spacing: -0.5px; }
+.coming-soon-card .cs-sub { color: #444; font-weight: 700; }
+.coming-soon-card .cs-actions { margin-top: 14px; }
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+.admin-form input, .admin-form textarea {
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fff;
+    resize: none;
+}
+.admin-form button {
+    background: linear-gradient(90deg, #ffd600 0%, #ff6f00 100%);
+    color: #181818;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, color 0.2s;
+}
+.admin-form button:hover {
+    background: linear-gradient(90deg, #ff6f00 0%, #ffd600 100%);
+    color: #fff;
+}
+.service-item {
+    background: #f8f8f8;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 18px 18px 12px 18px;
+    margin-bottom: 18px;
+    position: relative;
+}
+.service-item strong {
+    font-size: 1.1rem;
+    color: #ff6f00;
+}
+.service-item button {
+    margin-right: 8px;
+    margin-top: 8px;
+}
+.edit-modal-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.25);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.edit-modal {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+    padding: 32px 24px;
+    min-width: 320px;
+    max-width: 95vw;
+}
+.edit-modal h3 {
+    margin-top: 0;
+}

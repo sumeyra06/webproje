@@ -1,0 +1,8 @@
+# Local environment overrides (public anon key is okay, but avoid committing live values)
+/env.local.js
+
+# Logs
+*.log
+
+# macOS
+.DS_Store

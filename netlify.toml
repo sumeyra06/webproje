@@ -1,0 +1,118 @@
+# Netlify configuration for a static site
+[build]
+  publish = "."
+  command = ""
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin-panel.html"
+  status = 200
+  force = true
+
+# Pretty URLs for other standalone pages (serve without .html)
+[[redirects]]
+  from = "/login"
+  to = "/login.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/signup"
+  to = "/signup.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/user"
+  to = "/user-home.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/support"
+  to = "/support.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/gizlilik"
+  to = "/gizlilik.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/hakkimizda"
+  to = "/hakkimizda.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/iletisim"
+  to = "/iletisim.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/referanslar"
+  to = "/referanslar.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/xml-progress"
+  to = "/xml-progress.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/kisisel-verileri-koruma"
+  to = "/kisisel-verileri-koruma.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/bilgi-veri-guvenligi"
+  to = "/bilgi-veri-guvenligi.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/hizmetler"
+  to = "/hizmetler.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/urunler"
+  to = "/urunler.html"
+  status = 200
+  force = true
+
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Default headers (Dev/Preview friendly) — includes localhost for local backend testing
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+  Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.supabase.co; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://*; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co http://localhost:3002 http://127.0.0.1:500; frame-ancestors 'self';"
+
+# Production overrides — stricter CSP, HSTS, no localhost
+[context.production]
+  [[context.production.headers]]
+    for = "/*"
+    [context.production.headers.values]
+      X-Content-Type-Options = "nosniff"
+      X-Frame-Options = "SAMEORIGIN"
+      Referrer-Policy = "strict-origin-when-cross-origin"
+      Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+      Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+      # Replace https://api.example.com with your live backend if needed
+      Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.supabase.co; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://*; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co; frame-ancestors 'self';"

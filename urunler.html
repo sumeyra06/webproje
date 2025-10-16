@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ürünler | Yönetim Paneli</title>
+  <link rel="stylesheet" href="admin-panel.css">
+  <!-- Optional runtime env overrides (copy env.example.js -> env.local.js) -->
+  <script src="./env.local.js"></script>
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+    async function loadProducts() {
+      const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false }).limit(100);
+      const list = document.getElementById('productsList');
+      if (error) {
+        list.textContent = 'Veri alınamadı: ' + error.message;
+        return;
+      }
+      if (!data || data.length === 0) {
+        list.textContent = 'Hiç ürün bulunamadı.';
+        return;
+      }
+      let html = `<table class='admin-table'><thead><tr><th>ID</th><th>Ad</th><th>Açıklama</th><th>Marka</th><th>Kategori</th><th>Birim</th><th>URL</th><th>Trendyol'a Aktar</th></tr></thead><tbody>`;
+      for (const urun of data) {
+        html += `<tr>
+          <td>${urun.id}</td>
+          <td>${urun.name}</td>
+          <td>${urun.description}</td>
+          <td>${urun.brand_id}</td>
+          <td>${urun.category_id}</td>
+          <td>${urun.unit}</td>
+          <td><a href='${urun.url}' target='_blank'>Link</a></td>
+          <td><button class="singleTrendyolTransferBtn" data-id="${urun.id}" style="background:#1976d2;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-weight:600;cursor:pointer;">Aktar</button></td>
+        </tr>`;
+      }
+      html += '</tbody></table>';
+      list.innerHTML = html;
+      // Her ürün için Trendyol'a Aktar butonu event
+      setTimeout(() => {
+        const trendyolApiInfo = JSON.parse(localStorage.getItem('trendyolApiInfo') || '{}');
+        document.querySelectorAll('.singleTrendyolTransferBtn').forEach(btn => {
+          if (!trendyolApiInfo.apiKey || !trendyolApiInfo.apiSecret || trendyolApiInfo.isActive !== true) {
+            btn.disabled = true;
+            btn.title = 'Trendyol API bilgisi girilmedi veya pasif!';
+            btn.style.opacity = '0.5';
+            return;
+          }
+          btn.disabled = false;
+          btn.title = '';
+          btn.style.opacity = '1';
+          btn.onclick = async function() {
+            const productId = btn.getAttribute('data-id');
+            const { data, error } = await supabase.from('products').select('*').eq('id', productId).single();
+            if (error || !data) return alert('Ürün alınamadı!');
+            const p = data;
+            const trendyolProduct = {
+              barcode: p.product_id || p.id,
+              title: p.name,
+              productMainId: p.product_id || p.id,
+              brandId: p.brand_id || '',
+              categoryId: p.category_id || '',
+              quantity: p.stock || 0,
+              stockCode: p.product_id || p.id,
+              dimensionalWeight: p.dimensionalWeight || 1,
+              description: p.description || '',
+              currencyType: 'TRY',
+              listPrice: p.price || 0,
+              salePrice: p.price || 0,
+              vatRate: 18,
+              cargoCompanyId: p.cargoCompanyId || 10,
+              images: p.image_url ? [{ url: p.image_url }] : [],
+              attributes: [ ...(Array.isArray(p.attributes) ? p.attributes : []) ]
+            };
+            try {
+              const base = (typeof window !== 'undefined' && window.ENV && window.ENV.MP_BACKEND_URL) ? window.ENV.MP_BACKEND_URL : 'http://localhost:3002';
+              const res = await fetch(`${base}/trendyol/products`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: trendyolApiInfo.apiKey, password: trendyolApiInfo.apiSecret, items: [trendyolProduct] })
+              });
+              const result = await res.json();
+              if (res.ok) {
+                alert('Ürün Trendyol API ile gönderildi!\nYanıt: ' + JSON.stringify(result));
+              } else {
+                alert('Hata: ' + (result.error || JSON.stringify(result)));
+              }
+            } catch (err) {
+              alert('Bağlantı hatası: ' + err.message);
+            }
+          };
+        });
+      }, 200);
+    }
+    window.addEventListener('DOMContentLoaded', loadProducts);
+  </script>
+</head>
+<body>
+  <h2>Ürünler</h2>
+  <div style="margin-bottom:32px;">
+    <div style="font-size:1.25rem;font-weight:700;color:#ff9800;margin-bottom:10px;">Pazaryeri Entegrasyonları</div>
+    <div style="background:#f7f7f7;border-radius:12px;padding:18px 18px 12px 18px;max-width:600px;margin-bottom:18px;">
+      <div style="font-size:1.08rem;font-weight:600;color:#009688;margin-bottom:8px;">Trendyol Ürün Aktar</div>
+  <button id="exportTrendyolJson" style="margin-bottom:8px;padding:8px 18px;background:#ff9800;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Trendyol JSON Export</button>
+  <button id="sendToTrendyol" style="margin-bottom:8px;margin-left:12px;padding:8px 18px;background:#009688;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Pazaryerine Aktar</button>
+  <button id="directTrendyolTransfer" style="margin-bottom:8px;margin-left:12px;padding:8px 18px;background:#1976d2;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Trendyol'a Ürün Aktar</button>
+    </div>
+    <!-- Diğer pazaryeri sekmeleri buraya eklenebilir -->
+  </div>
+  <div id="productsList">Yükleniyor...</div>
+  <script>
+    document.getElementById('exportTrendyolJson').onclick = async function() {
+      const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false }).limit(100);
+      if (error || !data) return alert('Veri alınamadı!');
+      // Trendyol formatına dönüştür
+      const trendyolProducts = data.map(p => ({
+        barcode: p.product_id || p.id,
+        title: p.name,
+        productMainId: p.product_id || p.id,
+        brandId: p.brand_id || '',
+        categoryId: p.category_id || '',
+        quantity: p.stock || 0,
+        stockCode: p.product_id || p.id,
+        dimensionalWeight: p.dimensionalWeight || 1,
+        description: p.description || '',
+        currencyType: 'TRY',
+        listPrice: p.price || 0,
+        salePrice: p.price || 0,
+        vatRate: 18,
+        cargoCompanyId: p.cargoCompanyId || 10,
+        images: p.image_url ? [{ url: p.image_url }] : [],
+        attributes: [
+          ...(Array.isArray(p.attributes) ? p.attributes : [])
+        ]
+      }));
+      const json = JSON.stringify({ items: trendyolProducts }, null, 2);
+      // Download as file
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'trendyol-products.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+    document.getElementById('sendToTrendyol').onclick = async function() {
+      const info = JSON.parse(localStorage.getItem('trendyolApiInfo') || '{}');
+      const apiKey = info.apiKey;
+      const apiSecret = info.apiSecret;
+      const supplierId = info.supplierId;
+      if (!apiKey || !apiSecret || !supplierId) return alert('Trendyol API bilgileri eksik. Lütfen Entegrasyonlar sayfasından kaydedin.');
+      const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false }).limit(100);
+      if (error || !data) return alert('Veri alınamadı!');
+      const trendyolProducts = data.map(p => ({
+        barcode: p.product_id || p.id,
+        title: p.name,
+        productMainId: p.product_id || p.id,
+        brandId: p.brand_id || '',
+        categoryId: p.category_id || '',
+        quantity: p.stock || 0,
+        stockCode: p.product_id || p.id,
+        dimensionalWeight: p.dimensionalWeight || 1,
+        description: p.description || '',
+        currencyType: 'TRY',
+        listPrice: p.price || 0,
+        salePrice: p.price || 0,
+        vatRate: 18,
+        cargoCompanyId: p.cargoCompanyId || 10,
+        images: p.image_url ? [{ url: p.image_url }] : [],
+        attributes: [
+          ...(Array.isArray(p.attributes) ? p.attributes : [])
+        ]
+      }));
+      try {
+        const base = (typeof window !== 'undefined' && window.ENV && window.ENV.MP_BACKEND_URL) ? window.ENV.MP_BACKEND_URL : 'http://localhost:3002';
+        const res = await fetch(`${base}/trendyol/products`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey, apiSecret, supplierId, products: trendyolProducts })
+        });
+        const result = await res.json();
+        if (res.ok) {
+          alert('Ürünler Trendyol API ile gönderildi!\nYanıt: ' + JSON.stringify(result));
+        } else {
+          alert('Hata: ' + (result.error || JSON.stringify(result)));
+        }
+      } catch (err) {
+        alert('Bağlantı hatası: ' + err.message);
+      }
+    };
+  </script>
+</body>
+</html>

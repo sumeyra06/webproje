@@ -1,0 +1,1066 @@
+/* Footer politika linkleri - sade ve alt ortalı */
+.footer-policy-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    margin-bottom: 0;
+    flex-wrap: wrap;
+}
+.footer-policy-link {
+    color: #888;
+    font-size: 1rem;
+    text-decoration: underline dotted;
+    background: none;
+    border: none;
+    padding: 0 6px;
+    font-weight: 500;
+    transition: color 0.18s;
+}
+.footer-policy-link:hover {
+    color: #ff6f00;
+    text-decoration: underline;
+}
+.footer-policy-sep {
+    color: #ccc;
+    font-size: 1.1rem;
+    user-select: none;
+}
+/* --- Hakkımızda Bölümü (Kurumsal) --- */
+.section-about {
+    background: #fff;
+    margin-bottom: 64px;
+    padding-top: 32px;
+    padding-bottom: 32px;
+}
+.about-content {
+    max-width: 820px;
+    margin: 0 auto;
+    font-size: 1.18rem;
+    color: #222;
+    background: #f8f8ff;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    padding: 38px 38px 32px 38px;
+    line-height: 1.7;
+    text-align: left;
+    font-weight: 500;
+}
+.about-content b {
+    color: #ff6f00;
+    font-weight: 800;
+}
+@media (max-width: 900px) {
+    .about-content {
+        padding: 18px 10px;
+        font-size: 1.05rem;
+    }
+}
+/* --- Kurumsal Süreç/Müşteri Bilgilendirme (Proje Süreci) --- */
+.section-process {
+    background: #f8f8ff;
+    margin-bottom: 64px;
+    padding-top: 32px;
+    padding-bottom: 32px;
+}
+.process-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: space-between;
+    margin-top: 32px;
+}
+.process-step {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    padding: 32px 28px 28px 28px;
+    flex: 1 1 260px;
+    min-width: 220px;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: box-shadow 0.22s, transform 0.22s;
+    position: relative;
+    animation: fadeIn 1.1s;
+}
+.process-step:hover {
+    box-shadow: 0 12px 36px rgba(255,111,0,0.13);
+    transform: translateY(-6px) scale(1.04);
+    border: 1.5px solid #ffd600;
+}
+.process-step-number {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #ff6f00;
+    margin-bottom: 12px;
+    background: #fffbe7;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(255,214,0,0.10);
+}
+.process-step-content h3 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #181818;
+}
+.process-step-content p {
+    color: #444;
+    font-size: 1.05rem;
+    margin: 0;
+}
+@media (max-width: 900px) {
+    .process-steps {
+        flex-direction: column;
+        gap: 18px;
+        align-items: stretch;
+    }
+    .process-step {
+        max-width: 100%;
+        min-width: unset;
+    }
+}
+/* --- Kart ve buton animasyonları (Ticimax tarzı) --- */
+.eleks-service, .eleks-reference {
+    transition: box-shadow 0.25s, transform 0.22s, border 0.22s, background 0.22s;
+}
+.eleks-service:hover, .eleks-reference:hover {
+    box-shadow: 0 16px 48px rgba(255,111,0,0.13), 0 2px 16px rgba(0,0,0,0.08);
+    transform: translateY(-8px) scale(1.045);
+    border: 1.5px solid #ffd600;
+    background: #fffbe7;
+    z-index: 2;
+}
+.eleks-btn, .cta-btn, .animated-btn {
+    transition: transform 0.18s, box-shadow 0.18s, background 0.18s, color 0.18s;
+    will-change: transform, box-shadow;
+}
+.eleks-btn:hover, .cta-btn:hover, .animated-btn:hover {
+    transform: translateY(-3px) scale(1.06) rotate(-1deg);
+    box-shadow: 0 10px 32px rgba(255,111,0,0.15), 0 2px 12px rgba(255,214,0,0.10);
+    background: linear-gradient(90deg, #ff6f00 0%, #ffd600 100%);
+    color: #fff;
+}
+/* --- Ticimax tarzı section-wrapper ve bölümler arası boşluklar --- */
+.section-wrapper {
+    width: 100%;
+    background: #fff;
+    margin: 0 auto 64px auto;
+    padding: 0 0 0 0;
+    box-sizing: border-box;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.04);
+    border-radius: 32px;
+    transition: box-shadow 0.3s, background 0.3s;
+    animation: fadeIn 1.1s;
+}
+.section-wrapper:last-child {
+    margin-bottom: 0;
+}
+.section-slider {
+    margin-top: 32px;
+    margin-bottom: 80px;
+    box-shadow: 0 12px 48px rgba(255,214,0,0.07);
+}
+.section-services, .section-references, .section-contact {
+    margin-bottom: 80px;
+    padding-top: 32px;
+    padding-bottom: 32px;
+}
+@media (max-width: 900px) {
+    .section-wrapper {
+        border-radius: 12px;
+        margin-bottom: 32px;
+    }
+    .section-slider {
+        margin-top: 12px;
+        margin-bottom: 32px;
+    }
+    .section-services, .section-references, .section-contact {
+        margin-bottom: 32px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+}
+.slider-media-label {
+    position: absolute;
+    top: 18px;
+    left: 32px;
+    z-index: 10;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    font-size: 1.08rem;
+    font-weight: 700;
+    padding: 6px 18px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    letter-spacing: 0.5px;
+}
+.slider-mainbox {
+    background: rgba(255,255,255,0.92);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+    border-radius: 20px;
+    padding: 36px 44px 32px 44px;
+    margin-bottom: 18px;
+    max-width: 700px;
+    width: 100%;
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.slider-slide {
+    position: relative;
+    overflow: hidden;
+    min-height: 420px;
+    display: flex;
+    align-items: stretch;
+}
+.slider-bg-image {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+}
+.slider-bg-image img.slider-media-img {
+    width: 120vw;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    min-height: 420px;
+    object-fit: cover;
+    border-radius: 0;
+    box-shadow: none;
+    opacity: 0.48;
+    position: absolute;
+    top: 0;
+}
+.slider-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 64px 0 48px 0;
+}
+.slider-title {
+    color: #181818;
+    text-shadow: 0 2px 4px rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.18);
+    font-weight: 900;
+    letter-spacing: -1.5px;
+}
+.slider-desc {
+    color: #222;
+    text-shadow: 0 1px 4px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.10);
+}
+.cta-btn {
+    color: #fff;
+    background: linear-gradient(90deg, #ff6f00 0%, #ffd600 100%);
+    text-shadow: none;
+    font-weight: 800;
+    border: none;
+}
+.cta-btn:hover {
+    background: linear-gradient(90deg, #ffd600 0%, #ff6f00 100%);
+    color: #181818;
+}
+.slider-textbox {
+    background: rgba(255,255,255,0.82);
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    padding: 24px 32px;
+    margin-top: 24px;
+    max-width: 600px;
+    font-size: 1.1rem;
+    color: #222;
+    position: relative;
+    z-index: 3;
+}
+.slider-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 64px 0 48px 0;
+}
+.slider-title, .slider-desc, .cta-btn {
+    color: #181818;
+    text-shadow: 0 2px 16px rgba(255,255,255,0.85), 0 1px 2px rgba(0,0,0,0.08);
+}
+/* Slider medya görselleri */
+.slider-media-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 12px;
+    min-height: 40px;
+}
+.slider-media-img {
+    max-width: 180px;
+    max-height: 80px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    background: #fff;
+    object-fit: contain;
+}
+.slider-media-images {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    min-height: 120px;
+}
+.slider-media-img {
+    width: 100%;
+    max-width: 900px;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    background: #fff;
+    margin-bottom: 8px;
+}
+/* Başvuru Modalı */
+.apply-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.35);
+    justify-content: center;
+    align-items: center;
+}
+.apply-modal-content {
+    background: #fff;
+    padding: 32px 28px 24px 28px;
+    border-radius: 16px;
+    max-width: 350px;
+    width: 98%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.apply-close {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 2rem;
+    color: #ff6f00;
+    cursor: pointer;
+    font-weight: 900;
+}
+#applyForm {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    margin-top: 12px;
+}
+#applyForm input {
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fff;
+}
+/* Yönetici Giriş Butonu ve Modal */
+.admin-btn {
+    background: linear-gradient(90deg, #ffd600 0%, #ff6f00 100%);
+    color: #181818;
+    border: none;
+    border-radius: 24px;
+    padding: 10px 28px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-left: 32px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    box-shadow: 0 2px 8px rgba(255,214,0,0.08);
+}
+.admin-btn:hover {
+    background: linear-gradient(90deg, #ff6f00 0%, #ffd600 100%);
+    color: #fff;
+}
+.admin-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background: rgba(0,0,0,0.35);
+    justify-content: center;
+    align-items: center;
+}
+.admin-modal-content {
+    background: #fff;
+    margin: 60px auto;
+    padding: 36px 32px 32px 32px;
+    border-radius: 18px;
+    max-width: 600px;
+    width: 98%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+    position: relative;
+}
+.admin-close {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    font-size: 2rem;
+    color: #ff6f00;
+    cursor: pointer;
+    font-weight: 900;
+}
+#adminPanelTabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+.admin-tab {
+    background: #f8f8f8;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #181818;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.admin-tab.active, .admin-tab:hover {
+    background: linear-gradient(90deg, #ffd600 0%, #ff6f00 100%);
+    color: #fff;
+}
+#adminPanelContent {
+    min-height: 180px;
+}
+/* SLIDER BAŞLANGIÇ */
+.eleks-slider {
+    background: #fff;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #f2f2f2;
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+}
+.slider-wrapper {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+}
+.slider-slide {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 480px;
+    padding: 80px 0 60px 0;
+    animation: fadeIn 0.7s;
+}
+.slider-slide.active {
+    display: flex;
+}
+.slider-title {
+    font-size: 4.2rem;
+    font-weight: 900;
+    margin-bottom: 32px;
+    letter-spacing: -2.5px;
+    line-height: 1.08;
+    text-transform: uppercase;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.slider-desc {
+    font-size: 1.35rem;
+    color: #444;
+    margin-bottom: 38px;
+    line-height: 1.5;
+}
+.slider-controls {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    display: flex;
+    gap: 18px;
+}
+.slider-prev, .slider-next {
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    font-size: 2rem;
+    color: #ff6f00;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s, color 0.2s;
+}
+.slider-prev:hover, .slider-next:hover {
+    background: #ff6f00;
+    color: #fff;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 900px) {
+    .slider-title {
+        font-size: 2.2rem;
+    }
+    .slider-desc {
+        font-size: 1.1rem;
+    }
+    .slider-controls {
+        left: 10px;
+        bottom: 18px;
+    }
+}
+/* SLIDER BİTİŞ */
+body {
+    margin: 0;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #fff;
+    color: #181818;
+    font-size: 18px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+}
+/* Reusable brand background (matches auth pages) */
+.brand-bg {
+    background: radial-gradient(1200px 520px at 50% 0%, #121826, #0e1217 60%);
+    color: #f8fafc;
+}
+.container {
+    width: 92%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+/* Eleks.com tarzı header ve navbar */
+.main-header.eleks-header {
+    background: #fff;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 0;
+}
+/* Modern, şekilli logo */
+/* Sade, modern gradientli logo yazısı */
+.eleks-logo {
+    font-size: 3.2rem;
+    font-weight: 900;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.1;
+    color: #181818;
+    position: relative;
+    display: inline-block;
+}
+.eleks-logo .dot {
+    color: #ff6f00;
+    font-size: 3.5rem;
+    vertical-align: middle;
+    font-weight: 900;
+    margin-left: 2px;
+    filter: drop-shadow(0 2px 8px #ffd60088);
+}
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 0 18px 0;
+}
+/* Brand logo image */
+/* Brand text + orange square dot */
+.eleks-brand-text { vertical-align: middle; }
+.dot-square { display: inline-block; width: 16px; height: 16px; background: #ff6f00; margin-left: 6px; vertical-align: middle; border-radius: 3px; box-shadow: 0 2px 8px rgba(255,111,0,0.35); }
+@media (max-width: 700px) { .dot-square { width: 12px; height: 12px; } }
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 40px;
+    margin: 0;
+    padding: 0;
+}
+nav a {
+    color: #181818;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.08rem;
+    position: relative;
+    transition: color 0.2s;
+    padding: 2px 0;
+}
+nav a::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ffd600 0%, #ff6f00 100%);
+    transition: width 0.3s;
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+}
+nav a:hover {
+    color: #ff6f00;
+}
+nav a:hover::after {
+    width: 100%;
+}
+/* Screen-reader only utility */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+/* Trusted by logos */
+.trusted-by { background: #fff; padding: 22px 0 10px 0; border-top: 1px solid #f5f5f5; border-bottom: 1px solid #f5f5f5; }
+.trusted-by .trusted-title { text-align: center; color: #666; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.3px; font-size: 0.95rem; }
+.trusted-logos { display: flex; flex-wrap: wrap; gap: 22px; align-items: center; justify-content: center; }
+.trusted-logos img { height: 34px; width: auto; opacity: 0.9; filter: grayscale(100%) contrast(1.1); transition: filter .2s, opacity .2s, transform .2s; }
+.trusted-logos img:hover { filter: grayscale(0%) contrast(1); opacity: 1; transform: translateY(-2px); }
+/* Eleks.com tarzı hero alanı */
+.hero.eleks-hero {
+    background: #fff;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    padding: 80px 0 60px 0;
+    border-bottom: 1px solid #f2f2f2;
+}
+.eleks-hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    gap: 0;
+}
+.eleks-hero-text {
+    max-width: 800px;
+    text-align: left;
+    margin: 0 auto;
+}
+.eleks-hero-text h1 {
+    font-size: 4.2rem;
+    font-weight: 900;
+    margin-bottom: 32px;
+    letter-spacing: -2.5px;
+    line-height: 1.08;
+    text-transform: uppercase;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.eleks-gradient {
+    color: #ff6f00;
+    background: none;
+    font-weight: 900;
+    letter-spacing: -1.5px;
+}
+.eleks-hero-text p {
+    font-size: 1.35rem;
+    color: #444;
+    margin-bottom: 38px;
+    line-height: 1.5;
+}
+.eleks-btn {
+    background: linear-gradient(90deg, #ffd600 0%, #ff6f00 100%);
+    color: #181818;
+    padding: 18px 54px;
+    border: none;
+    border-radius: 32px;
+    font-size: 1.18rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 2px 12px rgba(255,214,0,0.08);
+    transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+    outline: none;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    margin-top: 10px;
+}
+.eleks-btn:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 24px rgba(255,111,0,0.13);
+    background: linear-gradient(90deg, #ff6f00 0%, #ffd600 100%);
+}
+.cta-btn, .animated-btn {
+    background: linear-gradient(90deg, #ffd600 0%, #ff6f00 100%);
+    color: #1a1a1a;
+    padding: 15px 44px;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 2px 12px rgba(255,214,0,0.08);
+    transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+
+    /* Warehouses panel tweaks */
+    .warehouses-card .card {
+        border-radius: 12px;
+    }
+    .card.shadow-sm.h-100 { /* already used, make spacing nicer */
+        padding: 0.65rem;
+    }
+    .card .card-body .card-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+    .dropdown-toggle .bi-three-dots-vertical {
+        font-size: 1rem;
+    }
+    .dropdown-menu .dropdown-item i {
+        font-size: 1rem;
+        vertical-align: middle;
+    }
+
+    /* Small responsive tweaks */
+    @media (max-width: 576px) {
+      .dropdown-toggle { padding: 0.25rem 0.5rem; }
+    }
+    outline: none;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+}
+.animated-btn:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 24px rgba(255,111,0,0.13);
+    background: linear-gradient(90deg, #ff6f00 0%, #ffd600 100%);
+}
+/* Eleks.com tarzı section başlıkları ve hizmetler */
+.section-title.eleks-section-title {
+    font-size: 2.8rem;
+    font-weight: 900;
+    margin-bottom: 54px;
+    color: #181818;
+    letter-spacing: -1.5px;
+    text-align: left;
+    text-transform: uppercase;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.eleks-service h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: #ff6f00;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.services.eleks-services {
+    background: #fff;
+    padding: 90px 0 60px 0;
+    text-align: left;
+}
+.eleks-service-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: flex-start;
+    margin-top: 18px;
+}
+.eleks-service {
+    background: #f8f8f8;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    padding: 38px 32px 28px 32px;
+    width: 340px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
+    font-size: 1.1rem;
+}
+.eleks-service h3 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #ff6f00;
+}
+.eleks-service p {
+    color: #444;
+    font-size: 1.05rem;
+}
+.eleks-service:hover {
+    box-shadow: 0 8px 32px rgba(255,111,0,0.10);
+    transform: translateY(-4px) scale(1.03);
+}
+/* Referanslar */
+.references.eleks-references {
+    background: #fff;
+    padding: 90px 0 60px 0;
+    text-align: left;
+}
+.eleks-reference-list {
+    display: flex;
+    gap: 40px;
+    margin-top: 18px;
+}
+.eleks-reference {
+    background: #f8f8f8;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    padding: 32px 32px 24px 32px;
+    min-width: 220px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #181818;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+/* İletişim */
+.contact.eleks-contact {
+    background: #fff;
+    padding: 90px 0 60px 0;
+    text-align: left;
+}
+.eleks-contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    max-width: 480px;
+    margin: 0 auto;
+    background: #f8f8f8;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    padding: 38px 28px;
+}
+.eleks-contact-form input, .eleks-contact-form textarea {
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1.08rem;
+    background: #fff;
+    resize: none;
+}
+.eleks-contact-form button {
+    margin-top: 8px;
+}
+/* Footer */
+.eleks-footer {
+    background: #fff;
+    color: #181818;
+    text-align: left;
+    padding: 32px 0 18px 0;
+    font-size: 1.08rem;
+    margin-top: 44px;
+    letter-spacing: 0.5px;
+    border-top: 1px solid #f2f2f2;
+}
+@media (max-width: 1100px) {
+    .eleks-service-list, .eleks-reference-list {
+        flex-direction: column;
+        gap: 24px;
+    }
+    .eleks-service, .eleks-reference {
+        width: 100%;
+        min-width: unset;
+    }
+}
+@media (max-width: 700px) {
+    .container {
+        width: 99%;
+    }
+    .eleks-hero-text h1 {
+        font-size: 2.1rem;
+    }
+    .section-title.eleks-section-title {
+        font-size: 1.3rem;
+    }
+    .eleks-service, .eleks-reference {
+        padding: 18px 10px;
+    }
+    .eleks-contact-form {
+        padding: 18px 8px;
+    }
+}
+@media (max-width: 900px) {
+    .hero-content {
+        flex-direction: column;
+        gap: 32px;
+        text-align: center;
+    }
+    .hero-img {
+        justify-content: center;
+    }
+    .modern-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+@media (max-width: 600px) {
+    .container {
+        width: 98%;
+    }
+    .hero-text h2 {
+        font-size: 2rem;
+    }
+    .section-title {
+        font-size: 1.4rem;
+    }
+    .modern-card {
+        width: 98%;
+        min-width: unset;
+    }
+}
+
+/* ===== Ön Muhasebe Landing (Yeni) ===== */
+/* Hero */
+.landing-hero { border-bottom: 1px solid #1e293b; padding: 72px 0 40px 0; }
+.landing-hero .hero-container {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 48px;
+    align-items: center;
+}
+.landing-hero .hero-text h1 {
+    font-size: 3.2rem;
+    font-weight: 900;
+    letter-spacing: -1.6px;
+    margin: 0 0 14px 0;
+    text-transform: uppercase;
+    color: #f8fafc;
+}
+.text-gradient {
+    background: linear-gradient(90deg, #ff6f00, #ffd600);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.landing-hero .hero-text p { font-size: 1.2rem; color: #cbd5e1; margin: 0 0 16px 0; }
+/* Improve section title contrast on dark brand background */
+body.brand-bg .section-title.eleks-section-title {
+    color: #f8fafc;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.45);
+}
+/* Contact section runs on light background, so keep title dark for readability */
+body.brand-bg .contact.eleks-contact { background: #ffffff; }
+body.brand-bg .contact.eleks-contact .section-title.eleks-section-title { color: #0b1220; text-shadow: none; }
+.landing-hero .hero-ctas { display: flex; gap: 12px; align-items: center; margin: 14px 0 10px 0; }
+.landing-hero .hero-metrics { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; }
+.landing-hero .hero-metrics span {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 0.98rem;
+    color: #e2e8f0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+.landing-hero .hero-visual { display: flex; justify-content: center; }
+.hero-illustration { width: 100%; max-width: 760px; height: auto; border-radius: 18px; box-shadow: 0 16px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06) inset; }
+.hero-slides { position: relative; width: 100%; max-width: 760px; }
+.hero-slides img { position: absolute; inset: 0; width: 100%; height: auto; border-radius: 18px; transition: opacity .8s ease, transform .35s ease; }
+.hero-slides img.base { position: relative; }
+.hero-slides img.overlay { opacity: 0; }
+.hero-visual-wrap:hover .hero-slides img.overlay { opacity: 1; transform: translateY(-2px) scale(1.005); }
+.hero-visual-wrap { position: relative; padding: 10px; border-radius: 22px; background: linear-gradient(135deg, rgba(255,214,0,0.45), rgba(255,111,0,0.25)); box-shadow: 0 12px 36px rgba(255,111,0,0.12); }
+.hero-visual-wrap::before { content: ''; position: absolute; inset: 0; padding: 1px; border-radius: 22px; background: linear-gradient(135deg, #ffd600, #ff6f00); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+.hero-visual-wrap { opacity: 0; transform: translateY(18px) scale(0.99); animation: heroIn .7s ease forwards .05s; }
+.hero-visual-wrap:hover { transform: translateY(-3px) scale(1.01); transition: transform .25s ease; }
+.hero-overlay-title { opacity: 0; transform: translateY(12px); animation: titleIn .8s ease forwards .2s; }
+@keyframes heroIn { to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes titleIn { to { opacity: 1; transform: translateY(0); } }
+/* badge-overlay removed for cleaner look */
+/* Slider-like overlay title on image */
+/* Overlay quote on image */
+.hero-overlay-quote { position: absolute; z-index: 3; left: 24px; bottom: 22px; right: 24px; margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: 0; color: #f8fafc; text-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.35); background: rgba(0,0,0,0.25); padding: 10px 12px; border-radius: 12px; backdrop-filter: blur(2px); }
+@media (max-width: 900px) { .hero-overlay-quote { font-size: 1rem; left: 12px; right: 12px; bottom: 12px; } }
+.app-mockup {
+    width: 100%; max-width: 520px; height: 360px; border-radius: 18px; background: #0e1217;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.25), inset 0 0 0 1px #1b2230;
+    padding: 14px; display: flex; flex-direction: column; gap: 10px; position: relative;
+}
+.app-mockup .mockup-topbar { height: 12px; border-radius: 8px; background: linear-gradient(90deg,#222,#1a1a1a); }
+.app-mockup .mockup-widget.big { flex: 0 0 110px; border-radius: 12px; background: linear-gradient(90deg,#14233a,#1b2a49); box-shadow: inset 0 0 0 1px #203155; }
+.app-mockup .mockup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.app-mockup .mockup-widget { height: 70px; border-radius: 12px; background: linear-gradient(90deg,#14233a,#1b2a49); box-shadow: inset 0 0 0 1px #203155; }
+.app-mockup .mockup-table { flex: 1; border-radius: 12px; background:
+    linear-gradient(#121a27 16px, transparent 0),
+    linear-gradient(90deg,#121a27 16px, transparent 0),
+    linear-gradient(#0f1722, #0f1722);
+    background-size: 100% 32px, 120px 100%, 100% 100%;
+    background-position: 0 0, 0 0, 0 0; background-repeat: repeat-y, no-repeat, no-repeat; box-shadow: inset 0 0 0 1px #1b2230;
+}
+@media (max-width: 900px) {
+    .landing-hero .hero-container { grid-template-columns: 1fr; text-align: center; }
+    .landing-hero .hero-ctas { justify-content: center; }
+    .landing-hero .hero-metrics { justify-content: center; }
+    .landing-hero .hero-text h1 { font-size: 2rem; }
+}
+
+/* Özellikler */
+.features { background: transparent; padding: 64px 0; }
+.feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.feature-card { background: #f8f8ff; border: 1px solid #f0f0f5; border-radius: 16px; padding: 22px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); transition: transform .2s, box-shadow .2s; }
+.feature-card:hover { transform: translateY(-6px); box-shadow: 0 12px 36px rgba(255,111,0,0.13); }
+.feature-card h3 { margin: 10px 0 6px 0; font-size: 1.22rem; color: #181818; }
+.feature-card p { margin: 0; color: #444; }
+.feature-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(90deg,#ffd600,#ff6f00); color: #181818; box-shadow: 0 2px 10px rgba(255,111,0,0.18); }
+.feature-icon i { font-size: 1.2rem; }
+@media (max-width: 900px) { .feature-grid { grid-template-columns: 1fr; } }
+
+/* Fiyatlar */
+.pricing { background: transparent; padding: 64px 0; }
+.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.price-card { background: #fff; border: 1px solid #eee; border-radius: 18px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); display: flex; flex-direction: column; align-items: flex-start; gap: 12px; color: #0b1220; }
+.price-card .price-badge { background: #fffbe7; color: #ff6f00; font-weight: 800; padding: 6px 12px; border-radius: 999px; font-size: 0.9rem; }
+.price-card .price-value { font-size: 2rem; font-weight: 900; letter-spacing: -1px; color: #0b1220; }
+.price-card .price-value span { font-size: 1rem; font-weight: 600; color: #334155; }
+.price-card ul { margin: 8px 0 8px 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.price-card ul li { color: #1f2937; display: flex; align-items: center; gap: 8px; }
+.price-card ul i { color: #14b814; }
+.price-card.highlighted { border-color: #ffd600; box-shadow: 0 12px 36px rgba(255,214,0,0.18); transform: translateY(-4px); }
+.price-card.highlighted .price-badge { background: linear-gradient(90deg,#ffd600,#ff6f00); color: #181818; }
+@media (max-width: 900px) { .pricing-grid { grid-template-columns: 1fr; } }
+
+/* Yorumlar */
+.testimonials { background: transparent; padding: 64px 0; }
+.testimonial-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.testimonial { background: #f8f8ff; border: 1px solid #f0f0f5; border-radius: 14px; padding: 18px; color: #222; box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+.testimonial p { margin: 0 0 8px 0; font-style: italic; }
+.testimonial span { color: #666; font-weight: 700; }
+@media (max-width: 900px) { .testimonial-grid { grid-template-columns: 1fr; } }
+
+/* SSS */
+.faq { background: transparent; padding: 64px 0; }
+.faq-list { display: grid; gap: 12px; max-width: 820px; margin: 0 auto; }
+.faq-list details { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 14px 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+.faq-list summary { cursor: pointer; font-weight: 800; color: #181818; }
+.faq-list p { color: #444; margin: 8px 0 0 0; }
+

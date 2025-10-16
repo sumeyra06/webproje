@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>XML Ürün Aktarım Progress</title>
+  <style>
+    #progressBar {
+      width: 100%;
+      background: #eee;
+      border-radius: 8px;
+      height: 30px;
+      margin-top: 20px;
+    }
+    #progressFill {
+      height: 100%;
+      width: 0%;
+      background: #4caf50;
+      border-radius: 8px;
+      transition: width 0.2s;
+      text-align: center;
+      color: #fff;
+      font-weight: bold;
+      line-height: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h2>XML'den Ürün Aktarımı</h2>
+    <button id="fetchBtn">XML'i Çek</button>
+    <button id="startBtn">XML'den Aktar</button>
+  <div id="progressBar">
+    <div id="progressFill">0%</div>
+  </div>
+  <div id="progressText"></div>
+  <script>
+      let evtSource;
+      document.getElementById('fetchBtn').onclick = async function() {
+        document.getElementById('progressText').textContent = 'XML verisi çekiliyor...';
+        try {
+          const res = await fetch('http://localhost:3001/xml/products?url=https://trendalibey.com.tr/TicimaxXml/97EAEF73F0834B929D0FE779E176D425/Urunler.xml');
+          if (!res.ok) throw new Error('XML çekilemedi: ' + res.status);
+          const data = await res.json();
+          document.getElementById('progressText').textContent = `XML başarıyla çekildi. Toplam ürün: ${data.products ? data.products.length : 0}`;
+        } catch (err) {
+          document.getElementById('progressText').textContent = 'Hata: ' + err.message;
+        }
+      };
+
+      document.getElementById('startBtn').onclick = function() {
+        // EventSource ile progress dinle
+        if (evtSource) evtSource.close();
+        evtSource = new EventSource('http://localhost:3001/xml/import-sse');
+        evtSource.onmessage = function(event) {
+          const data = JSON.parse(event.data);
+          document.getElementById('progressFill').style.width = data.progress + '%';
+          document.getElementById('progressFill').textContent = data.progress + '%';
+          document.getElementById('progressText').textContent = `${data.success} başarılı, ${data.fail} hata, toplam: ${data.total}`;
+          if (data.progress === 100) {
+            evtSource.close();
+          }
+        };
+        // Aktarımı başlat
+        fetch('http://localhost:3001/xml/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: 'https://trendalibey.com.tr/TicimaxXml/97EAEF73F0834B929D0FE779E176D425/Urunler.xml' })
+        });
+      };
+  </script>
+</body>
+</html>

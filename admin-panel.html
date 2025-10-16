@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetim Paneli | aksa yazılım</title>
+    <link rel="stylesheet" href="admin-panel.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+ </head>
+ <body>
+  <!-- Top dark header -->
+<header class="topbar" role="banner" aria-label="Uygulama üst çubuğu" style="background-color: #343a40; padding: 10px; color: white;">
+  <div class="topbar-left"></div>
+
+  <div class="topbar-right ms-auto" role="group" aria-label="Kullanıcı işlemleri"
+       style="display: flex; align-items: center; gap: 0.5rem;">
+
+    <span id="current-user-badge" class="chip" title="Giriş yapan kullanıcı" style="display: flex; align-items: center;">
+      <i class="bi bi-person-fill"></i>
+      <span class="chip-text" style="margin-left: 5px;">Kullanıcı</span>
+    </span>
+
+    <button id="support-btn" class="btn btn-sm btn-warning" type="button" aria-label="Destek">
+      <i class="bi bi-life-preserver me-1"></i>
+      Destek
+    </button>
+
+    <button id="logout-btn" class="btn btn-sm btn-danger" type="button" aria-label="Çıkış yap">
+      <i class="bi bi-box-arrow-right me-1"></i>
+      Çıkış
+    </button>
+
+  </div>
+</header>
+
+    </header>
+    <div class="admin-layout">
+    <aside class="admin-sidebar" id="sidebar">
+            <div class="admin-logo mb-4">
+                <div class="brand-stack">
+                    <div class="brand-line">
+                        <span class="fw-bold brand-name">aksa yazılım</span>
+                    </div>
+                    <div class="panel-title">Yönetim Paneli</div>
+                </div>
+            </div>
+            <div class="accordion" id="sidebarAccordion">
+                <!-- DASHBOARD -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingDashboard">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDashboard" aria-expanded="false" aria-controls="collapseDashboard">
+                            DASHBOARD
+                        </button>
+                    </h2>
+                    <div id="collapseDashboard" class="accordion-collapse collapse" aria-labelledby="headingDashboard" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0">
+                            <nav class="nav flex-column nav-pills gap-1 px-3 pb-2">
+                                <a class="nav-link" href="#dashboard">Genel Bakış</a>
+                                <a class="nav-link" id="nav-users-link" href="#users-management">Kullanıcılar</a>
+                                <a class="nav-link" id="nav-support-link" href="#support">Destek Mesajları</a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <!-- SATIŞLAR -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingSales">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSales" aria-expanded="false" aria-controls="collapseSales">
+                            SATIŞLAR
+                        </button>
+                    </h2>
+                    <div id="collapseSales" class="accordion-collapse collapse" aria-labelledby="headingSales" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0">
+                            <nav class="nav flex-column nav-pills gap-1 p-2">
+                                <a class="nav-link" href="#offers">Teklifler</a>
+                                <a class="nav-link" href="#invoices">Faturalar</a>
+                                <a class="nav-link" href="#customers">Müşteriler</a>
+                                <a class="nav-link" href="#sales-report">Satışlar Raporu</a>
+                                <a class="nav-link" href="#collections-report">Tahsilatlar Raporu</a>
+                                <a class="nav-link" href="#income-expense-report">Gelir Gider Raporu</a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <!-- GİDERLER -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingExpenses">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExpenses" aria-expanded="false" aria-controls="collapseExpenses">
+                            GİDERLER
+                        </button>
+                    </h2>
+                    <div id="collapseExpenses" class="accordion-collapse collapse" aria-labelledby="headingExpenses" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0">
+                            <nav class="nav flex-column nav-pills gap-1 p-2">
+                                <a class="nav-link" href="#expense-list">Gider Listesi</a>
+                                <a class="nav-link" href="#suppliers">Tedarikçiler</a>
+                                <a class="nav-link" href="#employees">Çalışanlar</a>
+                                <a class="nav-link" href="#expenses-report">Giderler Raporu</a>
+                                <a class="nav-link" href="#payments-report">Ödemeler Raporu</a>
+                                <a class="nav-link" href="#vat-report">KDV Raporu</a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <!-- NAKİT -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingCash">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCash" aria-expanded="false" aria-controls="collapseCash">
+                            NAKİT
+                        </button>
+                    </h2>
+                    <div id="collapseCash" class="accordion-collapse collapse" aria-labelledby="headingCash" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0">
+                            <nav class="nav flex-column nav-pills gap-1 p-2">
+                                <a class="nav-link" href="#cash-banks">Kasa ve Bankalar</a>
+                                <a class="nav-link" href="#cheques">Çekler</a>
+                                <a class="nav-link" href="#cash-bank-report">Kasa / Banka Raporu</a>
+                                <a class="nav-link" href="#cash-flow-report">Nakit Akışı Raporu</a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <!-- HİZMET VE ÜRÜNLER -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingStock">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStock" aria-expanded="false" aria-controls="collapseStock">
+                            STOK
+                        </button>
+                    </h2>
+                    <div id="collapseStock" class="accordion-collapse collapse" aria-labelledby="headingStock" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0">
+                            <nav class="nav flex-column nav-pills gap-1 px-3 pb-2">
+                                <a class="nav-link" href="#services-products">Hizmet ve Ürünler</a>
+                                <a class="nav-link" href="#warehouses">Depolar</a>
+                                <a class="nav-link" href="#warehouse-transfer">Depolar Arası Transfer</a>
+                                <a class="nav-link" href="#outgoing-dispatches">Giden İrsaliyeler</a>
+                                <a class="nav-link" href="#incoming-dispatches">Gelen İrsaliyeler</a>
+                                <a class="nav-link" href="#price-lists">Fiyat Listeleri</a>
+                                <a class="nav-link" href="#stock-history">Stok Geçmişi</a>
+                                <a class="nav-link" href="#stock-products-report">Stoktaki Ürünler Raporu</a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- E-TİCARET -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingECommerce">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseECommerce" aria-expanded="false" aria-controls="collapseECommerce">
+                            E-TİCARET
+                        </button>
+                    </h2>
+                    <div id="collapseECommerce" class="accordion-collapse collapse" aria-labelledby="headingECommerce" data-bs-parent="#sidebarAccordion">
+                        <div class="accordion-body p-0">
+                            <nav class="nav flex-column nav-pills gap-1 px-3 pb-2">
+                                <a class="nav-link" href="#ecommerce-orders">Siparişler</a>
+                                <a class="nav-link" href="#ecommerce-integrations">Entegrasyonlar</a>
+                                <a class="nav-link" href="#ecommerce-matched-products">Eşleştirilen Ürünler</a>
+                                <a class="nav-link" href="#ecommerce-settings">e-Ticaret Ayarları</a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <main class="admin-main">
+            <!-- SPA içerikleri buraya yüklenecek -->
+            <div id="main"></div>
+        </main>
+    </div>
+        <!-- Support Modal -->
+        <div class="modal fade" id="supportModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="supportForm">
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title">Destek Mesajı Gönder</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-2">
+                                <label class="form-label">Konu (opsiyonel)</label>
+                                <input id="supportSubject" class="form-control" placeholder="Kısa konu başlığı" />
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Mesaj</label>
+                                <textarea id="supportMessage" class="form-control" rows="4" required placeholder="Sorununuzu veya talebinizi yazın..."></textarea>
+                            </div>
+                            <div id="supportMsg" class="small"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                            <button type="submit" class="btn btn-primary">Gönder</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <!-- Optional runtime env overrides (copy env.example.js -> env.local.js) -->
+    <script src="env.local.js"></script>
+    <script type="module" src="products-panel.js"></script>
+    <script type="module" src="hizmet-ve-urunler-panel.js"></script>
+    <script type="module" src="dashboard-panel.js"></script>
+    <script type="module" src="musteriler-panel.js"></script>
+    <script type="module" src="offers-panel.js"></script>
+    <script type="module" src="sales-report-panel.js"></script>
+    <script type="module" src="collections-report-panel.js"></script>
+    <script type="module" src="income-expense-report-panel.js"></script>
+    <script type="module" src="vat-report-panel.js"></script>
+    <script type="module" src="expenses-report-panel.js"></script>
+    <script type="module" src="expenses-panel.js"></script>
+    <script type="module" src="cash-bank-report-panel.js"></script>
+    <script type="module" src="cash-banks-panel.js"></script>
+    <script type="module" src="invoices-panel.js"></script>
+    <script type="module" src="admin-panel.js"></script>
+    <script type="module" src="ecommerce-integrations-panel.js"></script>
+    <script type="module" src="ecommerce-orders-panel.js"></script>
+    <script type="module" src="users-management-panel.js"></script>
+        <script>
+            // Nav görünürlüğü: admin olmayanlardan 'Kullanıcılar' gizlenir
+                    (function() {
+                try {
+                    const raw = localStorage.getItem('sessionUser');
+                    const user = raw ? JSON.parse(raw) : null;
+                            const linkUsers = document.getElementById('nav-users-link');
+                            const linkSupport = document.getElementById('nav-support-link');
+                            if ((!user || user.role !== 'admin')) {
+                                if (linkUsers) linkUsers.style.display = 'none';
+                                if (linkSupport) linkSupport.style.display = 'none';
+                    }
+                } catch {}
+            })();
+        </script>
+</body>
+</html>
+

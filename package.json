@@ -1,0 +1,15 @@
+{
+  "type": "module",
+  "scripts": {
+    "mp:dev": "node trendyol-backend.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "axios": "^1.12.2",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "fast-xml-parser": "^5.2.5",
+    "node-cron": "^4.2.1",
+    "node-fetch": "^3.3.2"
+  }
+}

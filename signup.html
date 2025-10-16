@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Üyelik | AKSA YAZILIM</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Auth page layout - consistent with login */
+    body.auth-page { min-height: 100vh; margin: 0; background: radial-gradient(1200px 520px at 50% 0%, #121826, #0e1217 60%); display:flex; }
+    .auth-wrapper { display:grid; grid-template-columns: 1fr; place-items: center; width:100%; min-height: 100vh; padding: 16px 0; }
+    .auth-left { display:none; }
+    .auth-right { display:grid; align-content: center; justify-items: center; gap: 18px; padding: 12px 18px; width: 100%; max-width: 880px; margin: 0 auto; }
+    .auth-hero { padding: 0 8px; display:flex; align-items:center; justify-content:center; text-align:center; }
+    .auth-hero-inner { width: 92%; max-width: 740px; margin: 0 auto; }
+    .eleks-logo { font-size: 2.2rem; font-weight: 900; color:#fff; }
+    .eleks-logo .dot { color: #ff6f00; font-size: 2.4rem; margin-left: 2px; }
+    .auth-brand { font-size: 2.2rem; font-weight: 900; letter-spacing:-1px; text-transform: uppercase; color:#f59e0b; margin-bottom: 12px; text-shadow: 0 1px 2px rgba(0,0,0,0.55); }
+    .auth-tagline { font-size: 1.15rem; color: #cbd5e1; margin-bottom: 20px; text-shadow: 0 1px 2px rgba(0,0,0,0.55); }
+    .auth-points { display:grid; gap:10px; justify-items: center; text-align: center; }
+    .auth-point { display:flex; align-items:center; justify-content: center; gap:10px; color:#e2e8f0; text-shadow: 0 1px 2px rgba(0,0,0,0.55); }
+    .auth-point i { color: currentColor !important; }
+
+    .auth-card-side { background: transparent; display:flex; align-items:center; justify-content:center; padding: 0; position: relative; width:100%; }
+    .auth-card { width: 96%; max-width: 560px; background:#fff; border-radius: 16px; box-shadow: 0 16px 48px rgba(0,0,0,0.12); padding: 32px 28px; margin: 0 auto; }
+    .auth-card h2 { margin: 0 0 8px 0; font-size: 1.6rem; font-weight: 900; letter-spacing: -0.6px; text-align:center; }
+    .auth-card p { margin: 0 0 14px 0; color:#555; text-align:center; }
+    .auth-form { display:grid; gap: 12px; justify-items: center; }
+    .auth-form .form-row { display:grid; grid-template-columns: 1fr; gap: 10px; width: 100%; max-width: 560px; }
+    .auth-form label { font-size: 0.95rem; font-weight: 700; color:#333; }
+    .auth-form input { padding: 14px; border: 1px solid #e6e6ee; border-radius: 12px; font-size: 1rem; background: #ffffff; width: 100%; }
+    .auth-actions { max-width: 560px; width: 100%; display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-top: 6px; }
+    .auth-submit { width: 100%; padding: 12px; border-radius: 12px; border:none; font-weight: 800; font-size:1.05rem; cursor:pointer; background: linear-gradient(90deg, #ffd600 0%, #ff6f00 100%); color:#181818; }
+    .auth-submit:hover { background: linear-gradient(90deg, #ff6f00 0%, #ffd600 100%); color:#fff; }
+    .auth-home-btn { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap:8px; padding: 11px 14px; border-radius: 12px; border: 1px solid #e6e6ee; background:#ffffff; font-weight: 800; font-size:1.02rem; color:#181818; text-decoration: none; }
+    .auth-home-btn:hover { background:#f8f9fb; border-color:#ffd600; color:#ff6f00; text-decoration:none; }
+    .login-hint { text-align:center; margin-top: 10px; }
+    .login-hint a { color:#181818; font-weight:800; text-decoration:none; }
+    .login-hint a:hover { color:#ff6f00; text-decoration:underline; }
+    .login-error { color:#ff6f00; font-weight: 700; margin-top: 8px; display:none; text-align:center; }
+    .login-success { color:#16a34a; font-weight: 800; margin-top: 8px; display:none; text-align:center; }
+    @media (max-width: 900px) { .auth-right { padding: 18px 10px; } }
+  </style>
+</head>
+<body class="auth-page">
+  <div class="auth-wrapper">
+    <div class="auth-right">
+      <section class="auth-hero">
+        <div class="auth-hero-inner">
+          <div class="eleks-logo">AKSA YAZILIM<span class="dot">.</span></div>
+          <h1 class="auth-brand">Ön Muhasebe Platformu</h1>
+          <p class="auth-tagline">Ücretsiz başlayın, işinizi büyütün. Güvenli ve hızlı alt yapı.</p>
+          <div class="auth-points">
+            <div class="auth-point"><i class="bi bi-shield-check"></i> KVKK uyumlu</div>
+            <div class="auth-point"><i class="bi bi-speedometer"></i> Hızlı arayüz</div>
+            <div class="auth-point"><i class="bi bi-cloud-arrow-up"></i> Bulut altyapı</div>
+          </div>
+        </div>
+      </section>
+      <aside class="auth-card-side">
+        <div class="auth-card">
+          <h2>Üyelik Oluştur</h2>
+          <p>Bilgilerinizi doldurun ve hemen başlayın</p>
+          <form id="signupForm" class="auth-form" autocomplete="on">
+            <div class="form-row">
+              <label for="fullName"><i class="bi bi-person-fill"></i> Ad Soyad</label>
+              <input type="text" id="fullName" placeholder="Ad Soyad" required />
+            </div>
+            <div class="form-row">
+              <label for="companyTitle"><i class="bi bi-building"></i> Firma Ünvanı</label>
+              <input type="text" id="companyTitle" placeholder="Firma Ünvanı" />
+            </div>
+            <div class="form-row">
+              <label for="phone"><i class="bi bi-telephone"></i> Telefon</label>
+              <input type="tel" id="phone" placeholder="05xx..." />
+            </div>
+            <div class="form-row">
+              <label for="email"><i class="bi bi-envelope-fill"></i> E-posta</label>
+              <input type="email" id="email" placeholder="eposta@ornek.com" required />
+            </div>
+            <div class="form-row">
+              <label for="password"><i class="bi bi-lock-fill"></i> Şifre</label>
+              <input type="password" id="password" placeholder="••••••••" minlength="6" required />
+            </div>
+            <div id="formError" class="login-error"></div>
+            <div id="formSuccess" class="login-success"></div>
+            <div class="auth-actions" style="flex-direction:column;">
+              <button type="submit" class="auth-submit">Üye Ol</button>
+              <a href="index.html" class="auth-home-btn" title="Ana sayfaya dön"><i class="bi bi-house-door"></i> Ana sayfaya dön</a>
+            </div>
+            <div class="login-hint">Zaten hesabınız var mı? <a href="login.html">Giriş yapın</a>.</div>
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Optional runtime env overrides (copy env.example.js -> env.local.js) -->
+  <script src="./env.local.js"></script>
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+    const form = document.getElementById('signupForm');
+    const err = document.getElementById('formError');
+    const ok = document.getElementById('formSuccess');
+
+    const hashPassword = async (plain) => {
+      // Basit istemci-side SHA-256 (güvenlik için server-side yapılmalı)
+      const enc = new TextEncoder().encode(plain);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      const arr = Array.from(new Uint8Array(buf));
+      return arr.map(b => b.toString(16).padStart(2, '0')).join('');
+    };
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      err.style.display = 'none';
+      ok.style.display = 'none';
+      const full_name = document.getElementById('fullName').value.trim();
+      const company_title = document.getElementById('companyTitle').value.trim() || null;
+      const phone = document.getElementById('phone').value.trim() || null;
+      const email = document.getElementById('email').value.trim().toLowerCase();
+    const password = document.getElementById('password').value;
+    const role = 'user';
+      if (!full_name || !email || !password) {
+        err.textContent = 'Lütfen gerekli alanları doldurun (Ad Soyad, E-posta, Şifre).';
+        err.style.display = 'block';
+        return;
+      }
+      try {
+        const password_hash = await hashPassword(password);
+        const payload = { full_name, company_title, phone, email, password_hash, role };
+        const { data, error } = await supabase.from('users').insert([payload]).select('id').single();
+        if (error) throw error;
+        ok.textContent = 'Üyelik oluşturuldu. Giriş sayfasına yönlendiriliyorsunuz...';
+        ok.style.display = 'block';
+        setTimeout(()=> window.location.href = 'login.html', 1200);
+      } catch (e) {
+        err.textContent = 'Kayıt oluşturulamadı: ' + (e?.message || e);
+        err.style.display = 'block';
+        console.error('signup error', e);
+      }
+    };
+  </script>
+</body>
+</html>

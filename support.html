@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Destekler | Yönetim Paneli</title>
+  <link rel="stylesheet" href="admin-panel.css">
+</head>
+<body>
+  <div class="support-page-container" style="max-width:900px;margin:40px auto 0 auto;padding:32px 24px;background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+    <h1 style="font-size:1.5rem;font-weight:700;color:#ff9800;margin-bottom:8px;">Destekler</h1>
+    <p style="color:#666;margin-bottom:18px;">Aşağıda iletilen tüm destek taleplerini görebilir, durumlarını takip edebilirsiniz.</p>
+    <div id="supportLoading">Yükleniyor...</div>
+    <div id="supportTableArea"></div>
+  </div>
+  <!-- Optional runtime env overrides (copy env.example.js -> env.local.js) -->
+  <script src="./env.local.js"></script>
+  <script type="module">
+    import { supabase } from './supabaseClient.js';
+    document.getElementById('supportLoading').textContent = 'Yükleniyor...';
+  supabase.from('support_messages').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+      if (error) {
+        document.getElementById('supportLoading').textContent = 'Veri alınamadı: ' + error.message;
+        return;
+      }
+      if (!data || data.length === 0) {
+        document.getElementById('supportLoading').textContent = 'Hiç destek mesajı bulunamadı.';
+        return;
+      }
+      document.getElementById('supportLoading').style.display = 'none';
+      let html = `<div class=\"support-table\"><div class=\"support-table-header\"><span>Konu</span><span>Açıklama</span><span>Durum</span><span>Tarih</span></div>`;
+      data.forEach(s => {
+        html += `<div class=\"support-table-row${s.status==='Yanıtlanmadı'?' support-unanswered':''}\">\n  <span>${s.subject}</span>\n  <span>${s.message}</span>\n  <span>${s.status}</span>\n  <span>${new Date(s.created_at).toLocaleString()}</span>\n</div>`;
+      });
+      html += '</div>';
+      document.getElementById('supportTableArea').innerHTML = html;
+    });
+  </script>
+</body>
+</html>
