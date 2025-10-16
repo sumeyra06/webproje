@@ -191,7 +191,7 @@ async function onSubmitV2(e) {
   e.preventDefault();
   const owner = getCurrentUserId();
   const id = document.getElementById('invId').value;
-  const payload = {
+  const payloadBase = {
     owner_id: owner,
     name: document.getElementById('invName').value.trim() || null,
     invoice_no: document.getElementById('invNo').value.trim() || null,
@@ -217,12 +217,18 @@ async function onSubmitV2(e) {
     sub += line; taxSum += ltax;
     items.push({ owner_id: owner, qty, unit_price: price, tax_rate: tax, unit, description, line_subtotal: line, line_tax: ltax, line_total: line+ltax, sort_order: idx });
   });
-  payload.subtotal = sub; payload.tax_total = taxSum; payload.total = sub + taxSum;
+  const payload = { ...payloadBase, subtotal: sub, tax_total: taxSum, total: sub + taxSum };
 
   let err = null, invId = id;
   if (id) {
-    const { error } = await supabase.from('invoices_v2').update(payload).eq('owner_id', owner).eq('id', id);
-    err = error;
+    // UPDATE with fallback if 'name' column missing in schema cache
+    let res = await supabase.from('invoices_v2').update(payload).eq('owner_id', owner).eq('id', id);
+    err = res.error;
+    if (err && /name.+schema/i.test(err.message||'')) {
+      const { name, ...withoutName } = payload;
+      res = await supabase.from('invoices_v2').update(withoutName).eq('owner_id', owner).eq('id', id);
+      err = res.error;
+    }
     if (!err) {
       // Replace items: simplest correct approach
       await supabase.from('invoice_items_v2').delete().eq('owner_id', owner).eq('invoice_id', id);
@@ -230,12 +236,20 @@ async function onSubmitV2(e) {
       if (rows.length) await supabase.from('invoice_items_v2').insert(rows);
     }
   } else {
-    if (!payload.invoice_no) {
+    // INSERT with fallback if 'name' column missing in schema cache
+    const ensureNo = (p) => {
+      if (p.invoice_no) return p;
       const now = new Date(); const pad=n=>String(n).padStart(2,'0');
-      payload.invoice_no = `INV-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+      return { ...p, invoice_no: `INV-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}` };
+    };
+    let toSend = ensureNo(payload);
+    let res = await supabase.from('invoices_v2').insert([toSend]).select('id').single();
+    err = res.error; invId = res.data?.id;
+    if (err && /name.+schema/i.test(err.message||'')) {
+      const { name, ...withoutName } = toSend;
+      res = await supabase.from('invoices_v2').insert([withoutName]).select('id').single();
+      err = res.error; invId = res.data?.id;
     }
-    const { data, error } = await supabase.from('invoices_v2').insert([payload]).select('id').single();
-    err = error; invId = data?.id;
     if (!err && invId) {
       const rows = items.map(it => ({ ...it, invoice_id: invId }));
       if (rows.length) await supabase.from('invoice_items_v2').insert(rows);

@@ -129,38 +129,8 @@ function routePanel(panel) {
   case 'collections-report': return renderCollectionsReportPanel();
   case 'vat-report': return renderVatReportPanel();
     case 'invoices':
-      try {
-        console.log('[invoices-debug] typeof renderInvoicesPanel =', typeof renderInvoicesPanel);
-        const start = performance.now();
-        const invokeRender = (fn) => {
-          try {
-            fn();
-            setTimeout(() => {
-              const main = document.getElementById('main');
-              if (main && !main.innerHTML.includes('Satış Faturaları')) {
-                console.warn('[invoices-debug] Render sonrası beklenen başlık bulunamadı, fallback yerleştiriliyor.');
-                main.innerHTML = `<section class='container py-4'><h2>Faturalar (Fallback)</h2><div class='alert alert-warning'>Panel yüklenirken bir sorun oldu. Konsolda hata mesajlarını kontrol edin.</div></section>`;
-              }
-              console.log('[invoices-debug] Render süresi(ms)=', (performance.now()-start).toFixed(1));
-            }, 50);
-          } catch(e) {
-            console.error('[invoices-debug] renderInvoicesPanel çağrısında hata:', e);
-            const main = document.getElementById('main');
-            if (main) main.innerHTML = `<section class='container py-4'><h2>Faturalar</h2><div class='alert alert-danger'>Panel yüklenemedi: ${e.message}</div></section>`;
-          }
-        };
-        if (typeof renderInvoicesPanel === 'function') {
-          invokeRender(renderInvoicesPanel);
-        } else {
-          console.warn('renderInvoicesPanel tanımlı değil, dinamik import deneniyor...');
-          import('./invoices-panel.js').then(m => {
-            if (typeof m.renderInvoicesPanel === 'function') invokeRender(m.renderInvoicesPanel);
-            else console.error('invoices-panel.js içinde renderInvoicesPanel bulunamadı');
-          }).catch(err => console.error('invoices-panel dinamik import hatası:', err));
-        }
-      } catch (e) {
-        console.error('Faturalar paneli yüklenemedi:', e);
-      }
+      // Eski rota: v2'ye yönlendir
+      window.location.hash = '#invoices-v2';
       break;
     case 'invoices-v2':
       try {

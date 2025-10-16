@@ -5,6 +5,7 @@
 create table if not exists public.invoices_v2 (
   id bigserial primary key,
   owner_id uuid not null,
+  name text,
   customer_id bigint,
   customer_name text,
   invoice_no text,
@@ -61,6 +62,10 @@ do $$ begin
     for each row execute function public.set_updated_at();
   end if;
 end $$;
+
+-- Ensure 'name' column exists if table created earlier without it
+alter table if exists public.invoices_v2
+  add column if not exists name text;
 
 -- RLS
 alter table public.invoices_v2 enable row level security;
