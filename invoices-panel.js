@@ -465,28 +465,47 @@ async function openInvoiceForEdit(inv) {
       // Backfill from product if missing
       let descVal = firstOf(it, ['desc','description','aciklama','product_name','name']) || '';
       let unitVal = firstOf(it, ['unit','birim']) || 'Adet';
-      let qtyVal = parseNumberLoose(firstOf(it, ['qty','quantity','miktar','adet']));
-      let priceVal = parseNumberLoose(firstOf(it, ['price','unit_price','unitPrice','brutFiyat','fiyat','netFiyat','net_price','birim_fiyat','birimFiyat']));
-      let taxVal = parseNumberLoose(firstOf(it, ['tax','vat','vat_rate','kdv','kdv_orani','kdvOrani','tax_percent','taxPercent']));
+      let qtyVal = parseNumberLoose(firstOf(it, [
+        'qty','quantity','miktar','adet',
+        'count','adet_sayisi','adetSayisi','sayi','quantityOrdered','qty_ordered','countQty'
+      ]));
+      let priceVal = parseNumberLoose(firstOf(it, [
+        'price','unit_price','unitPrice','brutFiyat','fiyat','netFiyat','net_price','birim_fiyat','birimFiyat',
+        'price_net','priceNet','netAmount','unit_price_net','unitPriceNet','priceWithoutTax','unit_net'
+      ]));
+      let taxVal = parseNumberLoose(firstOf(it, [
+        'tax','vat','vat_rate','kdv','kdv_orani','kdvOrani','tax_percent','taxPercent',
+        'taxRate','tax_rate_percent','kdvYuzde','kdv_oran','tax_rate'
+      ]));
       if (!Number.isFinite(qtyVal)) qtyVal = 0;
+      // Saved net and gross totals with broad aliases
+      const savedNet = parseNumberLoose(firstOf(it, [
+        'lineTotal','line_total','satirToplam','total',
+        'netTotal','net_total','lineNet','line_amount_net'
+      ]));
+      const savedGross = parseNumberLoose(firstOf(it, [
+        'grossTotal','totalWithTax','toplamKdvDahil','satirToplamKdvDahil','line_total_with_tax',
+        'total_gross','lineGross','amountWithTax','amount_with_tax'
+      ]));
+      // Derive missing price or qty from saved totals
       if (!Number.isFinite(priceVal)) {
-        const lt = parseNumberLoose(firstOf(it, ['lineTotal','line_total','satirToplam','total']));
-        const q = Number.isFinite(qtyVal) ? qtyVal : parseNumberLoose(firstOf(it, ['qty','quantity','miktar','adet']));
-        const qSafe = Number.isFinite(q) ? q : 0;
-        if (Number.isFinite(lt) && qSafe > 0) {
-          priceVal = lt / qSafe;
+        const qBase = Number.isFinite(qtyVal) ? qtyVal : parseNumberLoose(firstOf(it, ['qty','quantity','miktar','adet']));
+        const qSafe = Number.isFinite(qBase) ? qBase : 0;
+        if (Number.isFinite(savedNet) && qSafe > 0) {
+          priceVal = savedNet / qSafe;
+        } else if (Number.isFinite(savedGross) && qSafe > 0) {
+          if (Number.isFinite(taxVal)) priceVal = savedGross / (qSafe * (1 + (taxVal/100)));
+          else priceVal = savedGross / qSafe;
         }
-        // As a last resort, try gross (tax-included) line totals
-        if (!Number.isFinite(priceVal)) {
-          const gross = parseNumberLoose(firstOf(it, ['grossTotal','totalWithTax','toplamKdvDahil','satirToplamKdvDahil','line_total_with_tax']));
-          if (Number.isFinite(gross) && qSafe > 0) {
-            if (Number.isFinite(taxVal)) {
-              priceVal = gross / (qSafe * (1 + (taxVal/100)));
-            } else {
-              priceVal = gross / qSafe; // assume gross ~ net if tax missing
-            }
-          }
+      }
+      if ((!Number.isFinite(qtyVal) || qtyVal <= 0) && Number.isFinite(priceVal)) {
+        if (Number.isFinite(savedNet) && priceVal > 0) {
+          qtyVal = savedNet / priceVal;
+        } else if (Number.isFinite(savedGross) && priceVal > 0) {
+          const denom = Number.isFinite(taxVal) ? priceVal * (1 + (taxVal/100)) : priceVal;
+          if (denom > 0) qtyVal = savedGross / denom;
         }
+        // If still not finite, keep 0 (user can adjust)
       }
       if (it.product_id && PRODUCTS_CACHE) {
         const p = PRODUCTS_CACHE.find(x => String(x.id) === String(it.product_id));
@@ -501,8 +520,6 @@ async function openInvoiceForEdit(inv) {
       const taxNum = Number.isFinite(taxVal) ? taxVal : 0;
       // Satır toplamını (KDV dahil) kaydedilmiş verilerden veya hesaplayarak göster
       const qNum = Number.isFinite(qtyVal) ? qtyVal : 0;
-      const savedNet = parseNumberLoose(firstOf(it, ['lineTotal','line_total','satirToplam','total']));
-      const savedGross = parseNumberLoose(firstOf(it, ['grossTotal','totalWithTax','toplamKdvDahil','satirToplamKdvDahil','line_total_with_tax']));
       let lineGross = null;
       if (Number.isFinite(savedGross)) {
         lineGross = savedGross;
