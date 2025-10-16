@@ -48,8 +48,8 @@ function parseItemsFlexible(raw) {
   try {
     if (Array.isArray(raw)) return raw;
     let val = raw;
-    // If string, attempt up to 2 parses in case of double-stringified JSON
-    for (let i = 0; i < 2 && typeof val === 'string'; i++) {
+    // If string, attempt up to 3 parses in case of double/triple-stringified JSON
+    for (let i = 0; i < 3 && typeof val === 'string'; i++) {
       try { val = JSON.parse(val); } catch { break; }
     }
     // Unwrap common containers
@@ -464,8 +464,8 @@ async function openInvoiceForEdit(inv) {
       let descVal = firstOf(it, ['desc','description','aciklama','product_name','name']) || '';
       let unitVal = firstOf(it, ['unit','birim']) || 'Adet';
       let qtyVal = parseNumberLoose(firstOf(it, ['qty','quantity','miktar','adet']));
-      let priceVal = parseNumberLoose(firstOf(it, ['price','unit_price','unitPrice','brutFiyat','fiyat']));
-      let taxVal = parseNumberLoose(firstOf(it, ['tax','vat','vat_rate','kdv']));
+      let priceVal = parseNumberLoose(firstOf(it, ['price','unit_price','unitPrice','brutFiyat','fiyat','netFiyat','net_price','birim_fiyat','birimFiyat']));
+      let taxVal = parseNumberLoose(firstOf(it, ['tax','vat','vat_rate','kdv','kdv_orani','kdvOrani','tax_percent','taxPercent']));
       if (!Number.isFinite(qtyVal)) qtyVal = 0;
       if (!Number.isFinite(priceVal)) {
         const lt = parseNumberLoose(firstOf(it, ['lineTotal','line_total','satirToplam','total']));
@@ -473,6 +473,17 @@ async function openInvoiceForEdit(inv) {
         const qSafe = Number.isFinite(q) ? q : 0;
         if (Number.isFinite(lt) && qSafe > 0) {
           priceVal = lt / qSafe;
+        }
+        // As a last resort, try gross (tax-included) line totals
+        if (!Number.isFinite(priceVal)) {
+          const gross = parseNumberLoose(firstOf(it, ['grossTotal','totalWithTax','toplamKdvDahil','satirToplamKdvDahil','line_total_with_tax']));
+          if (Number.isFinite(gross) && qSafe > 0) {
+            if (Number.isFinite(taxVal)) {
+              priceVal = gross / (qSafe * (1 + (taxVal/100)));
+            } else {
+              priceVal = gross / qSafe; // assume gross ~ net if tax missing
+            }
+          }
         }
       }
       if (it.product_id && PRODUCTS_CACHE) {
