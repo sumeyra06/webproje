@@ -50,13 +50,26 @@ function parseItemsFlexible(raw) {
     let val = raw;
     // If string, attempt up to 3 parses in case of double/triple-stringified JSON
     for (let i = 0; i < 3 && typeof val === 'string'; i++) {
-      try { val = JSON.parse(val); } catch { break; }
+      try { val = JSON.parse(val); } catch {
+        // Try converting single quotes to double quotes for legacy JSON-like strings
+        try {
+          const fixed = val.replace(/'(.*?)'/g, '"$1"');
+          val = JSON.parse(fixed);
+        } catch { break; }
+      }
     }
     // Unwrap common containers
     if (val && typeof val === 'object' && !Array.isArray(val)) {
       if (Array.isArray(val.items)) return val.items;
       if (Array.isArray(val.data)) return val.data;
       if (Array.isArray(val.lines)) return val.lines;
+      if (Array.isArray(val.rows)) return val.rows;
+      if (Array.isArray(val.values)) return val.values;
+      // Object with numeric keys => convert to array
+      const keys = Object.keys(val);
+      if (keys.length && keys.every(k => /^\d+$/.test(k))) {
+        return keys.sort((a,b)=>Number(a)-Number(b)).map(k => val[k]);
+      }
     }
     return Array.isArray(val) ? val : [];
   } catch { return []; }
@@ -455,6 +468,15 @@ async function openInvoiceForEdit(inv) {
   const tbody = document.querySelector('#itemsTable tbody');
   tbody.innerHTML = '';
   const parsedItems = parseItemsFlexible(inv.items);
+  if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
+    try {
+      console.warn('Invoice items parse fallback', {
+        invoice_id: inv.id,
+        typeof_items: typeof inv.items,
+        preview: typeof inv.items === 'string' ? String(inv.items).slice(0, 200) : inv.items
+      });
+    } catch {}
+  }
   // İlk açılışta veritabanındaki toplamları göster, kullanıcı değiştirene kadar yeniden hesaplama yapma
   let initialTotalsLocked = true;
   if (Array.isArray(parsedItems)) {
