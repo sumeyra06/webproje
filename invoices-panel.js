@@ -7,14 +7,37 @@ const getCurrentUserId = () => {
 // Eski fatura ve stokları hatırlamak için
 let ORIG_INV = null;
 
-// Loose numeric parser: accepts numbers or strings with comma decimal
+// Loose numeric parser: accepts numbers or strings with locale/currency; handles comma or dot decimals
 function parseNumberLoose(v) {
   if (v === null || v === undefined) return null;
   if (typeof v === 'number') return Number.isFinite(v) ? v : null;
   if (typeof v === 'string') {
-    const s = v.trim();
+    let s = v.trim();
     if (!s) return null;
-    const n = Number(s.replace(',', '.'));
+    // Remove all non numeric separators/currency except digits, dot, comma, minus
+    s = s.replace(/[^0-9.,\-]/g, '');
+    if (!s) return null;
+    const hasDot = s.includes('.');
+    const hasComma = s.includes(',');
+    if (hasDot && hasComma) {
+      // Determine decimal by last separator
+      const lastDot = s.lastIndexOf('.');
+      const lastComma = s.lastIndexOf(',');
+      if (lastComma > lastDot) {
+        // comma as decimal -> remove all dots (thousands), replace comma with dot
+        s = s.replace(/\./g, '').replace(',', '.');
+      } else {
+        // dot as decimal -> remove all commas (thousands)
+        s = s.replace(/,/g, '');
+      }
+    } else if (hasComma && !hasDot) {
+      // Only comma present -> treat as decimal
+      s = s.replace(',', '.');
+    } else {
+      // Only dot or none: remove stray commas
+      s = s.replace(/,/g, '');
+    }
+    const n = Number(s);
     return Number.isFinite(n) ? n : null;
   }
   return null;
@@ -406,13 +429,16 @@ async function openInvoiceForEdit(inv) {
       // Backfill from product if missing
       let descVal = it.desc || '';
       let unitVal = it.unit || 'Adet';
+      let qtyVal = parseNumberLoose(it.qty);
       let priceVal = parseNumberLoose(it.price);
       let taxVal = parseNumberLoose(it.tax);
+      if (!Number.isFinite(qtyVal)) qtyVal = 0;
       if (!Number.isFinite(priceVal)) {
         const lt = parseNumberLoose(it.lineTotal);
-        const q = parseNumberLoose(it.qty);
-        if (Number.isFinite(lt) && Number.isFinite(q) && q > 0) {
-          priceVal = lt / q;
+        const q = Number.isFinite(qtyVal) ? qtyVal : parseNumberLoose(it.qty);
+        const qSafe = Number.isFinite(q) ? q : 0;
+        if (Number.isFinite(lt) && qSafe > 0) {
+          priceVal = lt / qSafe;
         }
       }
       if (it.product_id && PRODUCTS_CACHE) {
@@ -428,7 +454,7 @@ async function openInvoiceForEdit(inv) {
       const taxNum = Number.isFinite(taxVal) ? taxVal : 0;
       tr.innerHTML = `
         <td><input list="productsDatalist" class="form-control form-control-sm item-desc" value="${(descVal)}"></td>
-        <td><input class="form-control form-control-sm item-qty" type="number" min="0" step="0.01" value="${it.qty||0}"></td>
+        <td><input class="form-control form-control-sm item-qty" type="number" min="0" step="0.01" value="${Number.isFinite(qtyVal)?qtyVal:0}"></td>
         <td><input class="form-control form-control-sm item-unit" value="${(unitVal)}"></td>
         <td><input class="form-control form-control-sm item-price" type="number" min="0" step="0.01" value="${priceNum.toFixed(2)}"></td>
         <td><input class="form-control form-control-sm item-tax" type="number" min="0" step="0.01" value="${taxNum}"></td>
