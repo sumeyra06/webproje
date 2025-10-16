@@ -13,6 +13,9 @@
             <div class="logo eleks-logo">
                 <span class="eleks-brand-text">AKSA YAZILIM</span><span class="dot-square" aria-hidden="true"></span>
             </div>
+            <button id="mobileNavToggle" class="mobile-nav-toggle" aria-label="Menüyü Aç/Kapat" title="Menü">
+                <i class="bi bi-list"></i>
+            </button>
             <nav>
                 <ul>
                                         <li><a href="#ozellikler">Özellikler</a></li>
@@ -21,6 +24,7 @@
                                         <li><a href="#iletisim">İletişim</a></li>
                 </ul>
             </nav>
+            <div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
                         <div class="d-flex" style="gap:10px;align-items:center;">
                             <a href="signup.html" class="admin-btn" style="text-decoration:none;">Üye Ol</a>
                             <a href="login.html" class="admin-btn" style="text-decoration:none;">Giriş</a>
@@ -231,6 +235,22 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 });
+</script>
+<script>
+// Mobile nav toggle
+(function(){
+    const btn = document.getElementById('mobileNavToggle');
+    const backdrop = document.getElementById('navBackdrop');
+    btn?.addEventListener('click', () => {
+        document.body.classList.toggle('nav-open');
+    });
+    backdrop?.addEventListener('click', () => {
+        document.body.classList.remove('nav-open');
+    });
+    document.addEventListener('keydown', (e)=>{
+        if(e.key === 'Escape') document.body.classList.remove('nav-open');
+    });
+})();
 </script>
 <!-- Footer görsel yükleme kaldırıldı -->
 </html>

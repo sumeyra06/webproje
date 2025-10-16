@@ -601,6 +601,21 @@ body {
     justify-content: space-between;
     padding: 24px 0 18px 0;
 }
+/* Mobile nav toggle (hidden on desktop) */
+.mobile-nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    border: 1px solid #e6e6e6;
+    background: #fff;
+    color: #181818;
+    cursor: pointer;
+    transition: box-shadow .2s, transform .2s, background .2s;
+}
+.mobile-nav-toggle:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.08); transform: translateY(-1px); }
+.mobile-nav-toggle i { font-size: 1.25rem; }
 /* Brand logo image */
 /* Brand text + orange square dot */
 .eleks-brand-text { vertical-align: middle; }
@@ -638,6 +653,22 @@ nav a:hover {
 }
 nav a:hover::after {
     width: 100%;
+}
+/* Off-canvas nav for mobile */
+.nav-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.38); z-index: 1990; }
+@media (max-width: 900px) {
+    .mobile-nav-toggle { display: inline-flex; }
+    .main-header.eleks-header .nav-container { gap: 12px; }
+    .main-header.eleks-header nav {
+        position: fixed; top: 0; right: 0; height: 100vh; width: 80vw; max-width: 320px;
+        background: #ffffff; box-shadow: -8px 0 24px rgba(0,0,0,0.08);
+        transform: translateX(100%);
+        transition: transform .25s ease; z-index: 2000; padding: 80px 20px 20px 20px;
+    }
+    body.nav-open .main-header.eleks-header nav { transform: translateX(0); }
+    .main-header.eleks-header nav ul { flex-direction: column; gap: 18px; }
+    .main-header.eleks-header nav a { font-size: 1.05rem; }
+    body.nav-open .nav-backdrop { display: block; }
 }
 /* Screen-reader only utility */
 .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
@@ -1021,6 +1052,11 @@ body.brand-bg .contact.eleks-contact .section-title.eleks-section-title { color:
     .landing-hero .hero-ctas { justify-content: center; }
     .landing-hero .hero-metrics { justify-content: center; }
     .landing-hero .hero-text h1 { font-size: 2rem; }
+}
+@media (max-width: 600px) {
+    .landing-hero { padding: 52px 0 28px 0; }
+    .landing-hero .hero-text p { font-size: 1.05rem; }
+    .eleks-btn, .animated-btn, .cta-btn { padding: 12px 22px; font-size: 1rem; }
 }
 
 /* Özellikler */
