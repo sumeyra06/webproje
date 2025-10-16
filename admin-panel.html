@@ -13,7 +13,11 @@
  <body>
   <!-- Top dark header -->
 <header class="topbar" role="banner" aria-label="Uygulama üst çubuğu" style="background-color: #343a40; padding: 10px; color: white;">
-  <div class="topbar-left"></div>
+    <div class="topbar-left">
+        <button id="sidebarToggle" class="btn btn-sm btn-light d-inline-flex align-items-center" aria-label="Menüyü Aç/Kapat" title="Menü" style="gap:6px;">
+            <i class="bi bi-list"></i><span class="d-none d-md-inline">Menü</span>
+        </button>
+    </div>
 
   <div class="topbar-right ms-auto" role="group" aria-label="Kullanıcı işlemleri"
        style="display: flex; align-items: center; gap: 0.5rem;">
@@ -38,6 +42,7 @@
 
     </header>
     <div class="admin-layout">
+    <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
     <aside class="admin-sidebar" id="sidebar">
             <div class="admin-logo mb-4">
                 <div class="brand-stack">
@@ -220,6 +225,22 @@
     <script type="module" src="ecommerce-orders-panel.js"></script>
     <script type="module" src="users-management-panel.js"></script>
         <script>
+            (function(){
+                const btn = document.getElementById('sidebarToggle');
+                const backdrop = document.getElementById('sidebarBackdrop');
+                btn?.addEventListener('click', () => {
+                    document.body.classList.toggle('sidebar-open');
+                });
+                backdrop?.addEventListener('click', () => {
+                    document.body.classList.remove('sidebar-open');
+                });
+                // Close on ESC
+                document.addEventListener('keydown', (e)=>{
+                    if(e.key === 'Escape') document.body.classList.remove('sidebar-open');
+                });
+            })();
+        </script>
+        <script>
             // Nav görünürlüğü: admin olmayanlardan 'Kullanıcılar' gizlenir
                     (function() {
                 try {
@@ -230,6 +251,14 @@
                             if ((!user || user.role !== 'admin')) {
                                 if (linkUsers) linkUsers.style.display = 'none';
                                 if (linkSupport) linkSupport.style.display = 'none';
+                    }
+                    // Hide E‑Ticaret accordion in production if no backend URL configured
+                    const ecAcc = document.getElementById('collapseECommerce')?.closest('.accordion-item');
+                    const envBase = (typeof window !== 'undefined' && window.ENV && window.ENV.MP_BACKEND_URL) ? window.ENV.MP_BACKEND_URL : null;
+                    const host = (typeof location !== 'undefined') ? location.hostname : '';
+                    const isLocal = host === 'localhost' || host === '127.0.0.1' || /\.local$/i.test(host);
+                    if (ecAcc && !envBase && !isLocal) {
+                        ecAcc.style.display = 'none';
                     }
                 } catch {}
             })();

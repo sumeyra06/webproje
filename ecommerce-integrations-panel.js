@@ -5,6 +5,16 @@
 export function renderEcommerceIntegrationsPanel() {
   const main = document.getElementById('main');
   if (!main) return;
+  // Helper: resolve backend base URL. Only fall back to localhost in local dev.
+  function getBase() {
+    const envBase = (typeof window !== 'undefined' && window.ENV && window.ENV.MP_BACKEND_URL) ? window.ENV.MP_BACKEND_URL : null;
+    if (envBase) return envBase;
+    try {
+      const host = (typeof location !== 'undefined') ? location.hostname : '';
+      const isLocal = host === 'localhost' || host === '127.0.0.1' || /\.local$/i.test(host);
+      return isLocal ? 'http://127.0.0.1:500' : null;
+    } catch { return null; }
+  }
   const saved = JSON.parse(localStorage.getItem('trendyolApiInfo') || '{}');
   const isActive = saved.isActive === true;
   main.innerHTML = `
@@ -83,7 +93,10 @@ export function renderEcommerceIntegrationsPanel() {
     try {
       const info = JSON.parse(localStorage.getItem('trendyolApiInfo') || '{}');
       if (!info.apiKey || !info.apiSecret || !info.supplierId) throw new Error('Eksik bilgi');
-      const base = (typeof window !== 'undefined' && window.ENV && window.ENV.MP_BACKEND_URL) ? window.ENV.MP_BACKEND_URL : 'http://localhost:3002';
+      const base = getBase();
+      if (!base) {
+        throw new Error('Canlı ortamda API adresi tanımlı değil. Lütfen backend’i yayınlayıp window.ENV.MP_BACKEND_URL olarak ayarlayın.');
+      }
       // Real validation via orders endpoint with minimal page size
       const payload = { apiKey: info.apiKey, apiSecret: info.apiSecret, supplierId: info.supplierId, page: 0, size: 1, status: 'Created' };
       const resp = await fetch(`${base}/trendyol/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });

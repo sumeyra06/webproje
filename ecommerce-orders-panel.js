@@ -71,7 +71,15 @@ export function renderEcommerceOrdersPanel() {
 
   const state = { page: 0, size: 20 };
   const $ = (id) => document.getElementById(id);
-  function getBase() { return (typeof window !== 'undefined' && window.ENV && window.ENV.MP_BACKEND_URL) ? window.ENV.MP_BACKEND_URL : 'http://localhost:3002'; }
+  function getBase() {
+    const envBase = (typeof window !== 'undefined' && window.ENV && window.ENV.MP_BACKEND_URL) ? window.ENV.MP_BACKEND_URL : null;
+    if (envBase) return envBase;
+    try {
+      const host = (typeof location !== 'undefined') ? location.hostname : '';
+      const isLocal = host === 'localhost' || host === '127.0.0.1' || /\.local$/i.test(host);
+      return isLocal ? 'http://127.0.0.1:500' : null;
+    } catch { return null; }
+  }
   function getCreds() { return JSON.parse(localStorage.getItem('trendyolApiInfo') || '{}'); }
 
   // Prefill default date range (last 30 days)
@@ -101,6 +109,12 @@ export function renderEcommerceOrdersPanel() {
       info.textContent = '';
       return;
     }
+    const base = getBase();
+    if (!base) {
+      rows.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-warning">Canlı ortamda API adresi tanımlı değil. Backend yayınlandığında Ayarlar/Entegrasyonlar kısmından window.ENV.MP_BACKEND_URL tanımlayın.</td></tr>`;
+      info.textContent = '';
+      return;
+    }
     const payload = {
       apiKey: creds.apiKey,
       apiSecret: creds.apiSecret,
@@ -112,7 +126,7 @@ export function renderEcommerceOrdersPanel() {
       endDate: $('ecEnd').value ? new Date($('ecEnd').value).toISOString() : null
     };
     try {
-      const resp = await fetch(`${getBase()}/trendyol/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const resp = await fetch(`${base}/trendyol/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       let json;
       try { json = await resp.json(); }
       catch { // Non-JSON (e.g., HTML 404)
