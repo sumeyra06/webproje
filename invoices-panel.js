@@ -7,6 +7,19 @@ const getCurrentUserId = () => {
 // Eski fatura ve stokları hatırlamak için
 let ORIG_INV = null;
 
+// Loose numeric parser: accepts numbers or strings with comma decimal
+function parseNumberLoose(v) {
+  if (v === null || v === undefined) return null;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+  if (typeof v === 'string') {
+    const s = v.trim();
+    if (!s) return null;
+    const n = Number(s.replace(',', '.'));
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
 async function renderInvoicesPanel() {
   const main = document.getElementById('main');
   main.innerHTML = `
@@ -393,23 +406,25 @@ async function openInvoiceForEdit(inv) {
       // Backfill from product if missing
       let descVal = it.desc || '';
       let unitVal = it.unit || 'Adet';
-      let priceVal = (it.price != null) ? Number(it.price) : null;
-      let taxVal = (it.tax != null) ? Number(it.tax) : null;
+      let priceVal = parseNumberLoose(it.price);
+      let taxVal = parseNumberLoose(it.tax);
       if (it.product_id && PRODUCTS_CACHE) {
         const p = PRODUCTS_CACHE.find(x => x.id === it.product_id);
         if (p) {
           if (!descVal) descVal = p.name + (p.code?` (${p.code})`:'');
           if (!it.unit && p.unit) unitVal = p.unit;
-          if (priceVal == null && p.sale_price != null) priceVal = Number(p.sale_price);
-          if (taxVal == null && p.vat_rate != null) taxVal = Number(p.vat_rate);
+          if (!Number.isFinite(priceVal) && p.sale_price != null) priceVal = parseNumberLoose(p.sale_price);
+          if (!Number.isFinite(taxVal) && p.vat_rate != null) taxVal = parseNumberLoose(p.vat_rate);
         }
       }
+      const priceNum = Number.isFinite(priceVal) ? priceVal : 0;
+      const taxNum = Number.isFinite(taxVal) ? taxVal : 0;
       tr.innerHTML = `
         <td><input list="productsDatalist" class="form-control form-control-sm item-desc" value="${(descVal)}"></td>
         <td><input class="form-control form-control-sm item-qty" type="number" min="0" step="0.01" value="${it.qty||0}"></td>
         <td><input class="form-control form-control-sm item-unit" value="${(unitVal)}"></td>
-        <td><input class="form-control form-control-sm item-price" type="number" min="0" step="0.01" value="${(priceVal!=null?priceVal:0).toFixed? (priceVal||0).toFixed(2) : (Number(priceVal||0)).toFixed(2)}"></td>
-        <td><input class="form-control form-control-sm item-tax" type="number" min="0" step="0.01" value="${(taxVal!=null?taxVal:0)}"></td>
+        <td><input class="form-control form-control-sm item-price" type="number" min="0" step="0.01" value="${priceNum.toFixed(2)}"></td>
+        <td><input class="form-control form-control-sm item-tax" type="number" min="0" step="0.01" value="${taxNum}"></td>
         <td class="text-end align-middle"><span class="line-total">0.00</span></td>
         <td><button type="button" class="btn btn-sm btn-outline-danger remove-row">Sil</button></td>
       `;
@@ -425,8 +440,14 @@ async function openInvoiceForEdit(inv) {
         if (match) {
           tr.dataset.productId = match.id;
           if (match.unit) tr.querySelector('.item-unit').value = match.unit;
-          if (match.sale_price != null) tr.querySelector('.item-price').value = Number(match.sale_price).toFixed(2);
-          if (match.vat_rate != null) tr.querySelector('.item-tax').value = Number(match.vat_rate).toFixed(2);
+          if (match.sale_price != null) {
+            const n = parseNumberLoose(match.sale_price);
+            tr.querySelector('.item-price').value = Number.isFinite(n) ? n.toFixed(2) : tr.querySelector('.item-price').value;
+          }
+          if (match.vat_rate != null) {
+            const n = parseNumberLoose(match.vat_rate);
+            tr.querySelector('.item-tax').value = Number.isFinite(n) ? n : tr.querySelector('.item-tax').value;
+          }
           recalcTotals();
         } else {
           delete tr.dataset.productId;
