@@ -455,6 +455,8 @@ async function openInvoiceForEdit(inv) {
   const tbody = document.querySelector('#itemsTable tbody');
   tbody.innerHTML = '';
   const parsedItems = parseItemsFlexible(inv.items);
+  // İlk açılışta veritabanındaki toplamları göster, kullanıcı değiştirene kadar yeniden hesaplama yapma
+  let initialTotalsLocked = true;
   if (Array.isArray(parsedItems)) {
     if (!PRODUCTS_CACHE) await preloadProducts();
     inv.items = parsedItems; // normalize
@@ -497,21 +499,34 @@ async function openInvoiceForEdit(inv) {
       }
       const priceNum = Number.isFinite(priceVal) ? priceVal : 0;
       const taxNum = Number.isFinite(taxVal) ? taxVal : 0;
+      // Satır toplamını (KDV dahil) kaydedilmiş verilerden veya hesaplayarak göster
+      const qNum = Number.isFinite(qtyVal) ? qtyVal : 0;
+      const savedNet = parseNumberLoose(firstOf(it, ['lineTotal','line_total','satirToplam','total']));
+      const savedGross = parseNumberLoose(firstOf(it, ['grossTotal','totalWithTax','toplamKdvDahil','satirToplamKdvDahil','line_total_with_tax']));
+      let lineGross = null;
+      if (Number.isFinite(savedGross)) {
+        lineGross = savedGross;
+      } else if (Number.isFinite(savedNet) && Number.isFinite(taxNum)) {
+        lineGross = savedNet * (1 + (taxNum/100));
+      } else {
+        lineGross = (qNum * priceNum) * (1 + (taxNum/100));
+      }
       tr.innerHTML = `
         <td><input list="productsDatalist" class="form-control form-control-sm item-desc" value="${(descVal)}"></td>
         <td><input class="form-control form-control-sm item-qty" type="number" min="0" step="0.01" value="${Number.isFinite(qtyVal)?qtyVal:0}"></td>
         <td><input class="form-control form-control-sm item-unit" value="${(unitVal)}"></td>
         <td><input class="form-control form-control-sm item-price" type="number" min="0" step="0.01" value="${priceNum.toFixed(2)}"></td>
         <td><input class="form-control form-control-sm item-tax" type="number" min="0" step="0.01" value="${taxNum}"></td>
-        <td class="text-end align-middle"><span class="line-total">0.00</span></td>
+        <td class="text-end align-middle"><span class="line-total">${Number.isFinite(lineGross)?lineGross.toFixed(2):'0.00'}</span></td>
         <td><button type="button" class="btn btn-sm btn-outline-danger remove-row">Sil</button></td>
       `;
   if (it.product_id != null) tr.dataset.productId = String(it.product_id);
       tbody.appendChild(tr);
 
       // Attach listeners like addItemRow
-      tr.querySelectorAll('.item-qty, .item-price, .item-tax').forEach(inp => inp.addEventListener('input', recalcTotals));
-      tr.querySelector('.remove-row').onclick = () => { tr.remove(); recalcTotals(); };
+      const onInputChange = () => { if (initialTotalsLocked) initialTotalsLocked = false; recalcTotals(); };
+      tr.querySelectorAll('.item-qty, .item-price, .item-tax').forEach(inp => inp.addEventListener('input', onInputChange));
+      tr.querySelector('.remove-row').onclick = () => { tr.remove(); initialTotalsLocked = false; recalcTotals(); };
       const descInput = tr.querySelector('.item-desc');
       descInput.addEventListener('change', async () => {
         const match = await resolveProduct(descInput.value);
@@ -526,6 +541,7 @@ async function openInvoiceForEdit(inv) {
             const n = parseNumberLoose(match.vat_rate);
             tr.querySelector('.item-tax').value = Number.isFinite(n) ? n : tr.querySelector('.item-tax').value;
           }
+          initialTotalsLocked = false;
           recalcTotals();
         } else {
           delete tr.dataset.productId;
@@ -536,7 +552,19 @@ async function openInvoiceForEdit(inv) {
   if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
     addItemRow();
   }
-  recalcTotals();
+  // Toplamları veritabanındaki değerlerden göster; yoksa hesapla
+  const subDb = parseNumberLoose(inv.subtotal);
+  const taxDb = parseNumberLoose(inv.tax_total);
+  const grandDb = parseNumberLoose(inv.total);
+  if (Number.isFinite(subDb) || Number.isFinite(taxDb) || Number.isFinite(grandDb)) {
+    if (Number.isFinite(subDb)) document.getElementById('subtotalText').textContent = subDb.toFixed(2);
+    if (Number.isFinite(taxDb)) document.getElementById('taxTotalText').textContent = taxDb.toFixed(2);
+    if (Number.isFinite(grandDb)) document.getElementById('grandTotalText').textContent = grandDb.toFixed(2);
+  } else {
+    // DB'de yoksa başlangıç hesaplaması yap
+    initialTotalsLocked = false;
+    recalcTotals();
+  }
   const modal = new bootstrap.Modal(document.getElementById('invoiceModal'));
   modal.show();
 
