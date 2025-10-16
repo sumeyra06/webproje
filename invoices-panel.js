@@ -43,6 +43,25 @@ function parseNumberLoose(v) {
   return null;
 }
 
+// Flexible parser for invoice items: accepts array, JSON string, or wrapped objects
+function parseItemsFlexible(raw) {
+  try {
+    if (Array.isArray(raw)) return raw;
+    let val = raw;
+    // If string, attempt up to 2 parses in case of double-stringified JSON
+    for (let i = 0; i < 2 && typeof val === 'string'; i++) {
+      try { val = JSON.parse(val); } catch { break; }
+    }
+    // Unwrap common containers
+    if (val && typeof val === 'object' && !Array.isArray(val)) {
+      if (Array.isArray(val.items)) return val.items;
+      if (Array.isArray(val.data)) return val.data;
+      if (Array.isArray(val.lines)) return val.lines;
+    }
+    return Array.isArray(val) ? val : [];
+  } catch { return []; }
+}
+
 async function renderInvoicesPanel() {
   const main = document.getElementById('main');
   main.innerHTML = `
@@ -338,7 +357,7 @@ async function loadInvoices() {
 
 function showInvoiceDetail(inv) {
   // items JSON string olabilir: parse et
-  let itemsArr = Array.isArray(inv.items) ? inv.items : (typeof inv.items === 'string' ? (()=>{try{return JSON.parse(inv.items)}catch{return []}})() : []);
+  let itemsArr = parseItemsFlexible(inv.items);
   let html = `<div class="p-3">`;
   html += `<div class="d-flex justify-content-end mb-2"><button class="btn btn-sm btn-outline-secondary" id="printInvoiceBtn">Yazdır</button></div>`;
   html += `<h5>${inv.name}</h5><div class='small text-muted mb-2'>${inv.customer_name || ''}</div>`;
@@ -388,6 +407,15 @@ function showInvoiceDetail(inv) {
   modal.show();
 }
 
+// Helper to get first non-null/undefined value by keys
+function firstOf(obj, keys) {
+  if (!obj) return undefined;
+  for (const k of keys) {
+    if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return obj[k];
+  }
+  return undefined;
+}
+
 async function openInvoiceForEdit(inv) {
   prepareInvoiceForm();
   // Edit mode labels
@@ -426,29 +454,29 @@ async function openInvoiceForEdit(inv) {
   // populate items (items JSON string olabilir)
   const tbody = document.querySelector('#itemsTable tbody');
   tbody.innerHTML = '';
-  const parsedItems = Array.isArray(inv.items) ? inv.items : (typeof inv.items === 'string' ? (()=>{try{return JSON.parse(inv.items)}catch{return []}})() : []);
+  const parsedItems = parseItemsFlexible(inv.items);
   if (Array.isArray(parsedItems)) {
     if (!PRODUCTS_CACHE) await preloadProducts();
     inv.items = parsedItems; // normalize
     parsedItems.forEach(it => {
       const tr = document.createElement('tr');
       // Backfill from product if missing
-      let descVal = it.desc || '';
-      let unitVal = it.unit || 'Adet';
-      let qtyVal = parseNumberLoose(it.qty);
-      let priceVal = parseNumberLoose(it.price);
-      let taxVal = parseNumberLoose(it.tax);
+      let descVal = firstOf(it, ['desc','description','aciklama','product_name','name']) || '';
+      let unitVal = firstOf(it, ['unit','birim']) || 'Adet';
+      let qtyVal = parseNumberLoose(firstOf(it, ['qty','quantity','miktar','adet']));
+      let priceVal = parseNumberLoose(firstOf(it, ['price','unit_price','unitPrice','brutFiyat','fiyat']));
+      let taxVal = parseNumberLoose(firstOf(it, ['tax','vat','vat_rate','kdv']));
       if (!Number.isFinite(qtyVal)) qtyVal = 0;
       if (!Number.isFinite(priceVal)) {
-        const lt = parseNumberLoose(it.lineTotal);
-        const q = Number.isFinite(qtyVal) ? qtyVal : parseNumberLoose(it.qty);
+        const lt = parseNumberLoose(firstOf(it, ['lineTotal','line_total','satirToplam','total']));
+        const q = Number.isFinite(qtyVal) ? qtyVal : parseNumberLoose(firstOf(it, ['qty','quantity','miktar','adet']));
         const qSafe = Number.isFinite(q) ? q : 0;
         if (Number.isFinite(lt) && qSafe > 0) {
           priceVal = lt / qSafe;
         }
       }
       if (it.product_id && PRODUCTS_CACHE) {
-        const p = PRODUCTS_CACHE.find(x => x.id === it.product_id);
+        const p = PRODUCTS_CACHE.find(x => String(x.id) === String(it.product_id));
         if (p) {
           if (!descVal) descVal = p.name + (p.code?` (${p.code})`:'');
           if (!it.unit && p.unit) unitVal = p.unit;
@@ -467,7 +495,7 @@ async function openInvoiceForEdit(inv) {
         <td class="text-end align-middle"><span class="line-total">0.00</span></td>
         <td><button type="button" class="btn btn-sm btn-outline-danger remove-row">Sil</button></td>
       `;
-      if (it.product_id) tr.dataset.productId = it.product_id;
+  if (it.product_id != null) tr.dataset.productId = String(it.product_id);
       tbody.appendChild(tr);
 
       // Attach listeners like addItemRow
@@ -494,7 +522,9 @@ async function openInvoiceForEdit(inv) {
       });
     });
   }
-  addItemRow();
+  if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
+    addItemRow();
+  }
   recalcTotals();
   const modal = new bootstrap.Modal(document.getElementById('invoiceModal'));
   modal.show();
