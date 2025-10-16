@@ -23,26 +23,25 @@ body { font-family: 'Inter', Arial, sans-serif; }
     display: flex;
     flex-direction: column;
 }
-    .admin-logo {
-        background: #111;
-        color: #00bfff;
-        .admin-sidebar .admin-logo .brand-title {
-             font-weight: 800;
-             font-size: 1.2rem; /* biraz daha büyük */
-             letter-spacing: 0.2px;
-             color: #f5f7fa; /* beyaza yakın, hafif kırık */
-             text-transform: lowercase;
-        font-weight: 800;
-        font-size: 1.18rem;
-        padding: 18px 0 12px 24px;
-        border-bottom: 1px solid #222;
-        letter-spacing: 1px;
-    }
-        .admin-sidebar .admin-logo .brand-subtitle {
-             font-weight: 600;
-             font-size: 0.88rem;
-             color: #d6dde5; /* biraz daha koyu */
-        }
+/* Sidebar logo and titles */
+.admin-logo {
+    background: #111;
+    color: #00bfff;
+}
+.admin-sidebar .admin-logo .brand-title {
+    font-weight: 800;
+    font-size: 1.18rem;
+    letter-spacing: 1px;
+    color: #f5f7fa;
+    text-transform: lowercase;
+    padding: 18px 0 12px 24px;
+    border-bottom: 1px solid #222;
+}
+.admin-sidebar .admin-logo .brand-subtitle {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #d6dde5;
+}
     /* Accordion başlıkları için daha sade görünüm */
     #salesAccordionToggle, #stockAccordionToggle, #expensesAccordionToggle {
         font-size: 1.08rem !important;
@@ -281,37 +280,40 @@ body { font-family: 'Inter', Arial, sans-serif; }
         text-overflow: ellipsis;
 }
 .product-meta {
-        font-size: 0.88rem;
-        color: #888;
-        margin-bottom: 4px;
-        display: block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    font-size: 0.88rem;
+    color: #888;
+    margin-bottom: 4px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .product-price-stock {
-                font-size: 0.97rem;
-                font-weight: 700;
-                color: #fff;
-                margin-bottom: 8px;
-                display: flex;
-                gap: 10px;
-                margin-top: -2px;
+    font-size: 0.97rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 10px;
+    margin-top: -2px;
 }
-            font-weight: 700;
-            color: #fff;
-            background: #009688;
-            border-radius: 8px;
-            padding: 3px 12px;
-            font-size: 0.97rem;
-            box-shadow: 0 2px 8px rgba(0,150,136,0.08);
+.product-stock {
+    font-weight: 700;
+    color: #fff;
+    background: #009688;
+    border-radius: 8px;
+    padding: 3px 12px;
+    font-size: 0.97rem;
+    box-shadow: 0 2px 8px rgba(0,150,136,0.08);
 }
-            font-weight: 700;
-            color: #fff;
-            background: #ff9800;
-            border-radius: 8px;
-            padding: 3px 12px;
-            font-size: 0.97rem;
-            box-shadow: 0 2px 8px rgba(255,152,0,0.08);
+.product-price {
+    font-weight: 700;
+    color: #fff;
+    background: #ff9800;
+    border-radius: 8px;
+    padding: 3px 12px;
+    font-size: 0.97rem;
+    box-shadow: 0 2px 8px rgba(255,152,0,0.08);
 }
 .product-link {
     display: inline-block;
@@ -685,6 +687,53 @@ body {
     box-shadow: 0 2px 16px rgba(0,0,0,0.06);
     padding: 40px 32px 32px 32px;
     min-height: 400px;
+}
+
+/* Mobile sidebar off-canvas and responsive optimizations */
+.sidebar-backdrop { display: none; }
+@media (max-width: 992px) {
+    /* Off-canvas sidebar */
+    .admin-sidebar {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        bottom: 0;
+        width: 82vw;
+        max-width: 320px;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        z-index: 1050;
+    }
+    body.sidebar-open .admin-sidebar { transform: translateX(0); }
+    body.sidebar-open .sidebar-backdrop {
+        display: block;
+        position: fixed;
+        z-index: 1040;
+        top: 56px; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.45);
+        backdrop-filter: blur(1px);
+    }
+    /* Make main area full width */
+    .admin-layout { flex-direction: column; }
+    .admin-main { margin-top: 56px; }
+    /* Compact topbar chips */
+    .topbar .chip .chip-text { max-width: 120px; }
+}
+
+@media (max-width: 768px) {
+    /* Tables scroll horizontally on small screens */
+    .admin-table { display: block; overflow-x: auto; white-space: nowrap; font-size: 0.94rem; }
+    .admin-table th, .admin-table td { padding: 10px 8px; }
+    /* Cards and grids stack */
+    .products-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .product-image { height: 140px; }
+}
+
+@media (max-width: 576px) {
+    .dashboard-title { font-size: 1.6rem; }
+    .card-value { font-size: 1.6rem; }
+    .admin-logo { font-size: 1.2rem; padding: 16px; }
+    .topbar { height: 56px; padding: 8px 12px; }
 }
 
 /* Coming Soon card */
