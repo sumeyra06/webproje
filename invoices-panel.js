@@ -135,7 +135,7 @@ async function renderInvoicesPanel() {
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">VAZGEÇ</button>
-              <button type="submit" class="btn btn-primary">KAYDET</button>
+              <button type="submit" class="btn btn-primary" id="invoiceSubmitBtn">KAYDET</button>
             </div>
           </form>
         </div>
@@ -148,6 +148,9 @@ async function renderInvoicesPanel() {
   // Modal açma
   document.getElementById('addInvoiceBtn').onclick = () => {
     prepareInvoiceForm();
+    // Create mode labels
+    const lbl = document.getElementById('invoiceModalLabel'); if (lbl) lbl.textContent = 'Yeni Fatura';
+    const sbtn = document.getElementById('invoiceSubmitBtn'); if (sbtn) sbtn.textContent = 'KAYDET';
     const modal = new bootstrap.Modal(document.getElementById('invoiceModal'));
     modal.show();
   };
@@ -345,6 +348,9 @@ function showInvoiceDetail(inv) {
 
 async function openInvoiceForEdit(inv) {
   prepareInvoiceForm();
+  // Edit mode labels
+  const lbl = document.getElementById('invoiceModalLabel'); if (lbl) lbl.textContent = 'Fatura Düzenle';
+  const sbtn = document.getElementById('invoiceSubmitBtn'); if (sbtn) sbtn.textContent = 'GÜNCELLE';
   document.getElementById('invoiceId').value = inv.id;
   document.getElementById('invoiceName').value = inv.name || '';
   document.getElementById('invoiceNo').value = inv.invoice_no || '';

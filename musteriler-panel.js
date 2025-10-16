@@ -184,7 +184,7 @@ async function renderCustomersPanel() {
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
-              <button type="submit" class="btn btn-primary">Kaydet</button>
+              <button type="submit" class="btn btn-primary" id="customerSubmitBtn">Kaydet</button>
             </div>
           </form>
         </div>
@@ -246,6 +246,7 @@ async function renderCustomersPanel() {
     document.getElementById('customerForm')?.reset();
     ibanList = []; renderIbans();
     document.getElementById('customerModalLabel').textContent = 'Yeni Müşteri';
+    const sbtn = document.getElementById('customerSubmitBtn'); if (sbtn) sbtn.textContent = 'Kaydet';
     const modal = new bootstrap.Modal(document.getElementById('customerModal'));
     modal.show();
     const form = document.getElementById('customerForm');
@@ -274,6 +275,7 @@ async function renderCustomersPanel() {
 
   function openEdit(item) {
     document.getElementById('customerModalLabel').textContent = 'Müşteri Düzenle';
+    const sbtn = document.getElementById('customerSubmitBtn'); if (sbtn) sbtn.textContent = 'Güncelle';
     const f = (id,v='') => { const el = document.getElementById(id); if (el) el.value = v||''; };
     f('companyTitle', item.company_title);
     f('shortName', item.short_name);
