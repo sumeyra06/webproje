@@ -587,6 +587,8 @@ body {
     position: relative;
     display: inline-block;
 }
+.brand-logo-img { height: 38px; width: auto; display: inline-block; vertical-align: middle; }
+.brand-logo-fallback { font-size: 1.6rem; vertical-align: middle; }
 .eleks-logo .dot {
     color: #ff6f00;
     font-size: 3.5rem;
@@ -601,6 +603,21 @@ body {
     justify-content: space-between;
     padding: 24px 0 18px 0;
 }
+.nav-ctas { display: flex; gap: 10px; align-items: center; }
+.nav-cta {
+    text-decoration: none;
+    font-weight: 800;
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-size: 0.98rem;
+    transition: transform .18s, box-shadow .18s, background .18s, color .18s;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,0.08); }
+.nav-cta--primary { background: linear-gradient(90deg, #ffd600 0%, #ff6f00 100%); color: #181818; }
+.nav-cta--primary:hover { background: linear-gradient(90deg, #ff6f00 0%, #ffd600 100%); color: #fff; }
+.nav-cta--ghost { background: #fff; color: #181818; border: 1px solid #e6e6e6; }
+.nav-cta--ghost:hover { background: #181818; color: #fff; border-color: #181818; }
 /* Mobile nav toggle (hidden on desktop) */
 .mobile-nav-toggle {
     display: none;
@@ -925,6 +942,9 @@ nav a:hover::after {
 @media (max-width: 700px) {
     .container {
         width: 99%;
+    /* Move CTAs into off-canvas menu on mobile */
+    .nav-ctas { display: none; }
+    .main-header.eleks-header nav .nav-cta-inline { display: block !important; margin-top: 12px; }
     }
     .eleks-hero-text h1 {
         font-size: 2.1rem;

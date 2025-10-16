@@ -10,8 +10,11 @@
 <body class="brand-bg">
         <header class="main-header eleks-header">
     <div class="container nav-container">
-            <div class="logo eleks-logo">
-                <span class="eleks-brand-text">AKSA YAZILIM</span><span class="dot-square" aria-hidden="true"></span>
+            <div class="logo">
+                <img src="assets/aksa-logo.svg" alt="AKSA YAZILIM" class="brand-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <span class="eleks-logo brand-logo-fallback" aria-hidden="true" style="display:none;">
+                    <span class="eleks-brand-text">AKSA YAZILIM</span><span class="dot-square" aria-hidden="true"></span>
+                </span>
             </div>
             <button id="mobileNavToggle" class="mobile-nav-toggle" aria-label="Menüyü Aç/Kapat" title="Menü">
                 <i class="bi bi-list"></i>
@@ -22,12 +25,15 @@
                                         <li><a href="#fiyatlar">Fiyatlar</a></li>
                                         <li><a href="#sss">SSS</a></li>
                                         <li><a href="#iletisim">İletişim</a></li>
+                    <!-- Mobile-only CTAs inside off-canvas nav -->
+                    <li class="nav-cta-inline" style="display:none;"><a href="signup.html" class="nav-cta nav-cta--primary">Üye Ol</a></li>
+                    <li class="nav-cta-inline" style="display:none;"><a href="login.html" class="nav-cta nav-cta--ghost">Giriş</a></li>
                 </ul>
             </nav>
             <div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
-                        <div class="d-flex" style="gap:10px;align-items:center;">
-                            <a href="signup.html" class="admin-btn" style="text-decoration:none;">Üye Ol</a>
-                            <a href="login.html" class="admin-btn" style="text-decoration:none;">Giriş</a>
+                        <div class="nav-ctas">
+                            <a href="signup.html" class="nav-cta nav-cta--primary">Üye Ol</a>
+                            <a href="login.html" class="nav-cta nav-cta--ghost">Giriş</a>
                         </div>
         </div>
     </header>
