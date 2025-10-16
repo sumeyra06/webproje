@@ -206,19 +206,25 @@ async function renderInvoicesPanel() {
     const collection_status = document.getElementById('collectionStatus').value;
   const stock_tracking_mode = document.querySelector('input[name="stockTracking"]:checked')?.value || 'out';
     const items = [];
+    let subtotal = 0, tax_total = 0;
     document.querySelectorAll('#itemsTable tbody tr').forEach(row => {
       const productId = row.dataset.productId || null;
       const desc = row.querySelector('.item-desc').value.trim();
-      const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+      const qtyRaw = row.querySelector('.item-qty').value;
+      const priceRaw = row.querySelector('.item-price').value;
+      const taxRaw = row.querySelector('.item-tax').value;
+      const qty = Number(parseNumberLoose(qtyRaw) ?? 0);
+      const price = Number(parseNumberLoose(priceRaw) ?? 0);
+      const tax = Number(parseNumberLoose(taxRaw) ?? 0);
       const unit = row.querySelector('.item-unit').value.trim();
-      const price = parseFloat(row.querySelector('.item-price').value) || 0;
-      const tax = parseFloat(row.querySelector('.item-tax').value) || 0;
-      const lineTotal = qty * price;
+      const line = qty * price;
+      const lineTax = line * (tax/100);
+      subtotal += line;
+      tax_total += lineTax;
+      const lineTotal = line; // net line total (without tax)
       items.push({ desc, qty, unit, price, tax, lineTotal, product_id: productId });
     });
-    const subtotal = parseFloat(document.getElementById('subtotalText').textContent.replace(/,/g,'')) || 0;
-    const tax_total = parseFloat(document.getElementById('taxTotalText').textContent.replace(/,/g,'')) || 0;
-    const total = parseFloat(document.getElementById('grandTotalText').textContent.replace(/,/g,'')) || 0;
+    const total = subtotal + tax_total;
 
     const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
     if (!invoice_no) {
@@ -598,9 +604,9 @@ function recalcTotals() {
   let subtotal = 0;
   let taxTotal = 0;
   document.querySelectorAll('#itemsTable tbody tr').forEach(tr => {
-    const qty = parseFloat(tr.querySelector('.item-qty').value) || 0;
-    const price = parseFloat(tr.querySelector('.item-price').value) || 0;
-    const tax = parseFloat(tr.querySelector('.item-tax').value) || 0;
+    const qty = Number(parseNumberLoose(tr.querySelector('.item-qty').value) ?? 0);
+    const price = Number(parseNumberLoose(tr.querySelector('.item-price').value) ?? 0);
+    const tax = Number(parseNumberLoose(tr.querySelector('.item-tax').value) ?? 0);
     const line = qty * price;
     const lineTax = line * (tax/100);
     subtotal += line;
