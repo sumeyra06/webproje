@@ -33,12 +33,23 @@ function labelMonth(key) {
 
 async function fetchInvoices() {
   const { data, error } = await supabase
-    .from('invoices')
-    .select('id, invoice_no, name, customer_name, total, tax_total, collection_status, edit_date, due_date, created_at')
+    .from('invoices_v2')
+    .select('id, invoice_no, name, customer_name, total, tax_total, collection_status, edit_date, due_date, created_at, currency')
     .eq('owner_id', getCurrentUserId())
     .order('created_at', { ascending: false })
     .limit(1000);
   if (error) throw error;
+  return data || [];
+}
+
+async function fetchInvoiceItemsByInvoices(invoiceIds) {
+  if (!invoiceIds?.length) return [];
+  const { data, error } = await supabase
+    .from('invoice_items_v2')
+    .select('invoice_id, tax_rate, line_tax, line_subtotal')
+    .in('invoice_id', invoiceIds)
+    .eq('owner_id', getCurrentUserId());
+  if (error) return [];
   return data || [];
 }
 
@@ -192,6 +203,17 @@ async function renderDashboardPanel() {
       </div>
 
       <div class="row mt-4 g-4">
+        <div class="col-12">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <h5 class="card-title mb-2">KDV Dağılımı (En çok 4 oran)</h5>
+              <div id="vatChips" class="d-flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4 g-4">
         <div class="col-12 col-xl-6">
           <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
@@ -272,6 +294,33 @@ async function renderDashboardPanel() {
   el('totalBalance').textContent = fmtTRY.format(pending);
   el('collectionNote').textContent = collected > 0 ? 'Toplam tahsil edilen tutar' : 'TAHSİLAT YOK';
   el('overdueNote').textContent = overdue > 0 ? `Vadesi geçmiş: ${fmtTRY.format(overdue)}` : 'VADESİ GEÇMİŞ ALACAK YOK';
+
+  // VAT distribution chips (top 4 by tax amount) based on fetched invoices' items
+  try {
+    const invoiceIds = invoices.map(i => i.id);
+    const items = await fetchInvoiceItemsByInvoices(invoiceIds);
+    const vatMap = new Map(); // rate -> { tax, base }
+    for (const it of items) {
+      const rate = Number(it.tax_rate || 0);
+      const agg = vatMap.get(rate) || { tax: 0, base: 0 };
+      agg.tax += Number(it.line_tax || 0);
+      agg.base += Number(it.line_subtotal || 0);
+      vatMap.set(rate, agg);
+    }
+    const list = Array.from(vatMap.entries())
+      .map(([rate, agg]) => ({ rate, tax: agg.tax, base: agg.base }))
+      .sort((a,b) => b.tax - a.tax)
+      .slice(0, 4);
+    const vatEl = document.getElementById('vatChips');
+    if (vatEl) {
+      if (!list.length) {
+        vatEl.innerHTML = '<span class="text-muted small">KDV kalemi yok</span>';
+      } else {
+        const chips = list.map(v => `<span class="badge rounded-pill bg-light text-dark border">${v.rate}% • ${fmtTRY.format(v.tax)} KDV</span>`).join(' ');
+        vatEl.innerHTML = chips;
+      }
+    }
+  } catch(_) {}
 
   // Charts
   const cash = computeWeeklyCashflow(invoices);

@@ -10,7 +10,6 @@ import { renderProductsPanel } from './products-panel.js';
 import { renderMediaPanel } from './media-panel.js';
 import { renderTeamPanel } from './team-panel.js';
 import { renderOffersPanel } from './offers-panel.js';
-import { renderInvoicesPanel } from './invoices-panel.js';
 import { renderInvoicesPanelV2 } from './invoices-panel-v2.js';
 import { renderDashboardPanel } from './dashboard-panel.js';
 import { renderServicesProductsPanel } from './hizmet-ve-urunler-panel.js';
@@ -136,9 +135,9 @@ function routePanel(panel) {
       try {
         renderInvoicesPanelV2();
       } catch (e) {
-        console.error('Faturalar v2 paneli yüklenemedi:', e);
+        console.error('Faturalar paneli yüklenemedi:', e);
         const main = document.getElementById('main');
-        if (main) main.innerHTML = `<section class='container py-4'><h2>Faturalar (v2)</h2><div class='alert alert-danger'>Panel yüklenemedi: ${e.message}</div></section>`;
+        if (main) main.innerHTML = `<section class='container py-4'><h2>Faturalar</h2><div class='alert alert-danger'>Panel yüklenemedi: ${e.message}</div></section>`;
       }
       break;
     case 'services-products': renderServicesProductsPanel(); break;
