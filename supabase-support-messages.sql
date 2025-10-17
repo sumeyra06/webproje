@@ -1,9 +1,10 @@
 -- Support messages table
 create table if not exists public.support_messages (
   id bigserial primary key,
-  user_id uuid not null,
+  user_id uuid,
   user_email text,
   user_full_name text,
+  user_phone text,
   subject text,
   message text not null,
   status text not null default 'open',

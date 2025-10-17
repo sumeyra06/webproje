@@ -138,7 +138,7 @@ export async function renderIncomeExpenseReportPanel() {
   async function hydrateCurrencies(){
     const owner = getOwnerId();
     const curSet = new Set();
-    const inv = await supabase.from('invoices').select('currency').eq('owner_id', owner).limit(1);
+  const inv = await supabase.from('invoices_v2').select('currency').eq('owner_id', owner).limit(1);
     (inv.data||[]).forEach(x=>curSet.add(x.currency||'TRY'));
     const exp = await supabase.from('expenses').select('currency').eq('owner_id', owner).limit(1);
     (exp.data||[]).forEach(x=>curSet.add(x.currency||'TRY'));
@@ -154,7 +154,7 @@ export async function renderIncomeExpenseReportPanel() {
     const cur = document.getElementById('ierCurrency').value;
 
     // Income = invoices.total, Expense = expenses.total
-    let qi = supabase.from('invoices').select('edit_date,total,currency,invoice_no,customer_name').eq('owner_id', owner);
+  let qi = supabase.from('invoices_v2').select('edit_date,total,currency,invoice_no,customer_name').eq('owner_id', owner);
     if (start) qi = qi.gte('edit_date', start);
     if (end) qi = qi.lte('edit_date', end);
     if (cur) qi = qi.eq('currency', cur);

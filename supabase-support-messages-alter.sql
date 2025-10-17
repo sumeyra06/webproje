@@ -3,8 +3,19 @@
 
 -- Core columns
 alter table if exists public.support_messages add column if not exists user_id uuid;
+-- Allow anonymous (nullable) user_id for customer requests
+do $$
+begin
+	if exists (
+		select 1 from information_schema.columns
+		where table_schema = 'public' and table_name = 'support_messages' and column_name = 'user_id'
+	) then
+		alter table public.support_messages alter column user_id drop not null;
+	end if;
+exception when others then null; end $$;
 alter table if exists public.support_messages add column if not exists user_email text;
 alter table if exists public.support_messages add column if not exists user_full_name text;
+alter table if exists public.support_messages add column if not exists user_phone text;
 alter table if exists public.support_messages add column if not exists subject text;
 alter table if exists public.support_messages add column if not exists message text;
 alter table if exists public.support_messages add column if not exists status text default 'open';

@@ -22,6 +22,7 @@ import { renderSupportPanel } from './support-panel.js';
 import { renderCashBanksPanel } from './cash-banks-panel.js';
 import { renderCashBankReportPanel } from './cash-bank-report-panel.js';
 import { supabase } from './supabaseClient.js';
+import { renderPriceListsPanel } from './price-lists-panel.js';
 // E-Ticaret panelleri
 import { renderEcommerceIntegrationsPanel } from './ecommerce-integrations-panel.js';
 import { renderEcommerceOrdersPanel } from './ecommerce-orders-panel.js';
@@ -74,6 +75,34 @@ window.addEventListener('hashchange', () => {
 	routePanel(hash);
 });
 
+// Route titles for dynamic document.title updates
+const ROUTE_TITLES = {
+  'dashboard': 'Genel Bakış',
+  'users-management': 'Kullanıcılar',
+  'support': 'Destek Mesajları',
+  'products': 'Ürünler',
+  'customers': 'Müşteriler',
+  'sales': 'Satışlar',
+  'offers': 'Teklifler',
+  'invoices-v2': 'Faturalar',
+  'services-products': 'Hizmet ve Ürünler',
+  'warehouses': 'Depolar',
+  'stock-products-report': 'Stoktaki Ürünler Raporu',
+  'sales-report': 'Satışlar Raporu',
+  'income-expense-report': 'Gelir Gider Raporu',
+  'collections-report': 'Tahsilatlar Raporu',
+  'vat-report': 'KDV Raporu',
+  'cash-banks': 'Kasa ve Bankalar',
+  'cash-bank-report': 'Kasa / Banka Raporu',
+  'ecommerce-integrations': 'e-Ticaret Entegrasyonları',
+  'ecommerce-orders': 'e-Ticaret Siparişleri',
+};
+
+function updateTitleFor(panel){
+  const name = ROUTE_TITLES[panel] || COMING_SOON_FALLBACK(panel, null) || 'Sayfa';
+  document.title = name;
+}
+
 function routePanel(panel) {
   console.log('routePanel çağrıldı:', panel);
   // Unimplemented pages should show a stylish "Coming Soon" screen
@@ -90,10 +119,11 @@ function routePanel(panel) {
     'warehouse-transfer': 'Depolar Arası Transfer',
     'outgoing-dispatches': 'Giden İrsaliyeler',
     'incoming-dispatches': 'Gelen İrsaliyeler',
-    'price-lists': 'Fiyat Listeleri',
+  // 'price-lists': 'Fiyat Listeleri', // now implemented
     'stock-history': 'Stok Geçmişi'
   };
   if (COMING_SOON_TITLES[panel]) {
+    updateTitleFor(panel);
     return renderComingSoon(COMING_SOON_FALLBACK(panel, COMING_SOON_TITLES[panel]));
   }
   switch(panel) {
@@ -101,38 +131,44 @@ function routePanel(panel) {
   case 'cash-bank-report': return renderCashBankReportPanel();
   case 'expense-list': return renderExpensesPanel();
   case 'expenses-report': return renderExpensesReportPanel();
-    case 'dashboard': renderDashboardPanel(); break;
+  case 'price-lists': return renderPriceListsPanel();
+    case 'dashboard': updateTitleFor(panel); renderDashboardPanel(); break;
     case 'users-management':
       if (CURRENT_USER && CURRENT_USER.role === 'admin') {
+        updateTitleFor(panel);
         renderUsersManagementPanel();
       } else {
+        updateTitleFor('dashboard');
         const main = document.getElementById('main');
         if (main) main.innerHTML = `<section class='container py-4'><div class='alert alert-warning'>Bu sayfaya yalnızca yönetici hesapları erişebilir.</div></section>`;
       }
       break;
     case 'support':
       if (CURRENT_USER && CURRENT_USER.role === 'admin') {
+        updateTitleFor(panel);
         renderSupportPanel();
       } else {
+        updateTitleFor('dashboard');
         const main = document.getElementById('main');
         if (main) main.innerHTML = `<section class='container py-4'><div class='alert alert-warning'>Bu sayfaya yalnızca yönetici hesapları erişebilir.</div></section>`;
       }
       break;
-    case 'products': renderProductsPanel(); break;
-    case 'customers': renderCustomersPanel(); break;
-    case 'sales': renderSalesPanel(); break;
-    case 'product-tracking': renderProductTrackingPanel(); break;
-  case 'offers': renderOffersPanel(); break;
-  case 'sales-report': return renderSalesReportPanel();
-  case 'income-expense-report': return renderIncomeExpenseReportPanel();
-  case 'collections-report': return renderCollectionsReportPanel();
-  case 'vat-report': return renderVatReportPanel();
+    case 'products': updateTitleFor(panel); renderProductsPanel(); break;
+    case 'customers': updateTitleFor(panel); renderCustomersPanel(); break;
+    case 'sales': updateTitleFor(panel); renderSalesPanel(); break;
+    case 'product-tracking': updateTitleFor(panel); renderProductTrackingPanel(); break;
+  case 'offers': updateTitleFor(panel); renderOffersPanel(); break;
+  case 'sales-report': updateTitleFor(panel); return renderSalesReportPanel();
+  case 'income-expense-report': updateTitleFor(panel); return renderIncomeExpenseReportPanel();
+  case 'collections-report': updateTitleFor(panel); return renderCollectionsReportPanel();
+  case 'vat-report': updateTitleFor(panel); return renderVatReportPanel();
     case 'invoices':
       // Eski rota: v2'ye yönlendir
       window.location.hash = '#invoices-v2';
       break;
     case 'invoices-v2':
       try {
+        updateTitleFor(panel);
         renderInvoicesPanelV2();
       } catch (e) {
         console.error('Faturalar paneli yüklenemedi:', e);
@@ -140,18 +176,18 @@ function routePanel(panel) {
         if (main) main.innerHTML = `<section class='container py-4'><h2>Faturalar</h2><div class='alert alert-danger'>Panel yüklenemedi: ${e.message}</div></section>`;
       }
       break;
-    case 'services-products': renderServicesProductsPanel(); break;
-  case 'warehouses': renderWarehousesPanel(); break;
-    case 'stock-products-report': renderStockProductsReportPanel(); break;
-    case 'blog': renderBlogPanel(); break;
-    case 'team': renderTeamPanel(); break;
-    case 'media': renderMediaPanel(); break;
+    case 'services-products': updateTitleFor(panel); renderServicesProductsPanel(); break;
+  case 'warehouses': updateTitleFor(panel); renderWarehousesPanel(); break;
+    case 'stock-products-report': updateTitleFor(panel); renderStockProductsReportPanel(); break;
+    case 'blog': updateTitleFor(panel); renderBlogPanel(); break;
+    case 'team': updateTitleFor(panel); renderTeamPanel(); break;
+    case 'media': updateTitleFor(panel); renderMediaPanel(); break;
     // E-TİCARET
-  case 'ecommerce-integrations': renderEcommerceIntegrationsPanel(); break;
-  case 'ecommerce-orders': return renderEcommerceOrdersPanel();
-    case 'ecommerce-matched-products': return renderComingSoon('Eşleştirilen Ürünler');
-    case 'ecommerce-settings': return renderComingSoon('e-Ticaret Ayarları');
-    default: renderDashboardPanel();
+  case 'ecommerce-integrations': updateTitleFor(panel); renderEcommerceIntegrationsPanel(); break;
+  case 'ecommerce-orders': updateTitleFor(panel); return renderEcommerceOrdersPanel();
+    case 'ecommerce-matched-products': updateTitleFor(panel); return renderComingSoon('Eşleştirilen Ürünler');
+    case 'ecommerce-settings': updateTitleFor(panel); return renderComingSoon('e-Ticaret Ayarları');
+    default: updateTitleFor('dashboard'); renderDashboardPanel();
   }
 }
 
@@ -180,9 +216,14 @@ function renderComingSoon(title) {
   if (back) back.addEventListener('click', () => { window.location.hash = '#dashboard'; });
 }
 
-// İlk yüklemede dashboard göster
-if (!window.location.hash) window.location.hash = '#dashboard';
-else routePanel(window.location.hash.replace('#', ''));
+// İlk yüklemede dashboard göster ve başlık ayarla
+if (!window.location.hash) {
+  window.location.hash = '#dashboard';
+  updateTitleFor('dashboard');
+} else {
+  updateTitleFor(window.location.hash.replace('#',''));
+  routePanel(window.location.hash.replace('#', ''));
+}
 
 // Support modal handlers
 (() => {

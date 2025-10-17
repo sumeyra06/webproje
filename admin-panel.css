@@ -67,6 +67,7 @@ body { font-family: 'Inter', Arial, sans-serif; }
 .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1200; width: 100%; background: #0f172a; color: #e5e7eb; display: flex; align-items: center; justify-content: center; padding: 10px 18px; box-shadow: 0 2px 16px rgba(0,0,0,0.35); height: 56px; }
 .topbar .topbar-left { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 10px; }
 /* topbar-left intentionally left empty for optional brand/logo */
+/* removed temporary topbar brand block */
 .topbar .topbar-right { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 10px; }
 /* User chip */
 .topbar .chip {
@@ -352,13 +353,14 @@ body { font-family: 'Inter', Arial, sans-serif; }
     align-items: center;
     justify-content: center; /* ortala */
     gap: 10px;
-    padding: 14px 16px !important; /* biraz daha ferah */
+    padding: 22px 16px !important; /* biraz daha aşağı taşı */
     margin: 0 !important;
 }
 .admin-layout .admin-sidebar .admin-logo .brand-logo {
-    width: 20px !important; /* biraz daha küçült */
-    height: 20px !important;
-    flex: 0 0 20px !important;
+    width: auto !important;
+    height: 1.4rem !important; /* Yönetim Paneli metin boyutuna yakın */
+    flex: 0 0 auto !important;
+    display: block;
 }
 .admin-layout .admin-sidebar .admin-logo .brand-stack {
     display: flex;
@@ -367,21 +369,34 @@ body { font-family: 'Inter', Arial, sans-serif; }
     text-align: center;  /* ortala */
     line-height: 1.08;
 }
+.admin-layout .admin-sidebar .admin-logo .brand-name {
+    font-size: 2rem; /* biraz daha büyük */
+    font-weight: 900;
+    color: #f84343 !important; /* marka kırmızısı */
+    letter-spacing: -0.5px;
+    position: relative;
+    left: -6px; /* çapraz hizalama için hafif offset */
+}
 .admin-layout .admin-sidebar .admin-logo .brand-stack .brand-line {
     display: flex;
     align-items: baseline;
     gap: 4px;
 }
 .admin-layout .admin-sidebar .admin-logo .panel-title {
-    font-size: 0.9rem; /* biraz büyüt */
-    opacity: 0.95;
-    margin-top: 3px;
+    font-size: 0.9rem; /* biraz daha küçük */
+    font-weight: 900;
+    opacity: 0.98;
+    margin-top: 4px;
     color: #f59e0b !important; /* turuncu */
+    position: relative;
+    left: 6px; /* çapraz hizalama için hafif offset */
 }
 .admin-layout .admin-sidebar .admin-logo .brand-name {
     font-size: 1rem; /* marka adını az büyüt */
 }
-.admin-layout .admin-sidebar .admin-logo .brand-name { color: #f3f4f6 !important; font-weight: 800; }
+.admin-layout .admin-sidebar .admin-logo .brand-name { color: #f84343 !important; font-weight: 800; }
+/* Keep SVG logo fill color as brand red on dark background */
+.admin-layout .admin-sidebar .admin-logo .brand-logo { filter: none !important; }
 /* panel-title rengi turuncu olmalı; aşağıdaki satır kaldırıldı */
 /*.admin-layout .admin-sidebar .admin-logo .panel-title { color: #e5e7eb !important; }*/
 .admin-layout .admin-sidebar .admin-logo .dot { color: #60a5fa !important; }
@@ -390,6 +405,7 @@ body { font-family: 'Inter', Arial, sans-serif; }
 .admin-layout .admin-sidebar .accordion-item,
 .admin-layout .admin-sidebar .accordion-collapse,
 .admin-layout .admin-sidebar .accordion-body { background: #0b0b0b !important; border: 0; }
+.admin-layout .admin-sidebar #sidebarAccordion { margin-top: 8px; }
 .admin-layout .admin-sidebar .accordion-button {
     background: #0b0b0b !important;
     color: #e5e7eb !important;
@@ -631,6 +647,17 @@ body {
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #181818;
     color: #f3f3f3;
+}
+/* Global footer note for admin pages */
+body::after {
+    content: "Eylül Teknoloji — Tüm hakları saklıdır.";
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: #9ca3af; /* lighter on dark bg */
+    font-size: 0.95rem;
+    padding: 12px 8px 18px 8px;
+    margin-top: 14px;
 }
 .admin-header {
     background: #fff;

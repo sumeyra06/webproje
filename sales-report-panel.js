@@ -130,7 +130,7 @@ export async function renderSalesReportPanel() {
     const end = document.getElementById('srEnd').value;
     const collection = document.getElementById('srCollection').value;
 
-    let q = supabase.from('invoices').select('*').eq('owner_id', owner_id);
+  let q = supabase.from('invoices_v2').select('*').eq('owner_id', owner_id);
     if (start) q = q.gte('edit_date', start);
     if (end) q = q.lte('edit_date', end);
     if (collection && collection !== 'ALL') q = q.eq('collection_status', collection);

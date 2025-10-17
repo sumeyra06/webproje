@@ -587,7 +587,15 @@ body {
     position: relative;
     display: inline-block;
 }
-.brand-logo-img { height: 38px; width: auto; display: inline-block; vertical-align: middle; }
+.brand-logo-img { height: 48px; width: auto; display: inline-block; vertical-align: middle; }
+.brand-logo--header { height: 50px; }
+@media (max-width: 900px) { .brand-logo--header { height: 40px; } }
+.brand-logo--auth { height: 46px; }
+.brand-logo--admin { height: 30px; }
+/* Keep brand logo original color (#f84343) on all backgrounds */
+body.brand-bg .brand-logo-img,
+.auth-page .brand-logo-img,
+.admin-sidebar .brand-logo { filter: none !important; }
 .brand-logo-fallback { font-size: 1.6rem; vertical-align: middle; }
 .eleks-logo .dot {
     color: #ff6f00;
@@ -936,6 +944,37 @@ nav a:hover::after {
     margin-top: 44px;
     letter-spacing: 0.5px;
     border-top: 1px solid #f2f2f2;
+}
+/* Landing sayfasında (brand-bg) footer üst boşluğu kaldır, siyah şerit oluşmasın */
+body.brand-bg .eleks-footer { margin-top: 0; }
+/* Global footer note across all pages */
+body::after {
+    content: "Eylül Teknoloji — Tüm hakları saklıdır.";
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: #6b7280; /* slate-500 */
+    font-size: 0.95rem;
+    padding: 12px 8px 18px 8px;
+    margin-top: 20px;
+}
+/* Landing (brand-bg) sayfasında global alt notu gizle; metin footer içinde gösterilecek */
+body.brand-bg::after {
+    display: block;
+    background: #0b1220; /* dark footer strip */
+    color: #e5e7eb;
+    padding: 12px 8px 18px 8px;
+}
+/* Auth pages (login/signup): show rights text fixed at bottom, centered */
+body.auth-page::after {
+    content: "Eylül Teknoloji — Tüm hakları saklıdır.";
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.92rem;
+    padding: 8px 6px;
+    pointer-events: none;
 }
 @media (max-width: 1100px) {
     .eleks-service-list, .eleks-reference-list {

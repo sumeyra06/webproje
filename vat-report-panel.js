@@ -137,7 +137,7 @@ export async function renderVatReportPanel() {
     rows.innerHTML = `<tr><td colspan="7" class="text-center py-4">Yükleniyor...</td></tr>`;
     rateRows.innerHTML = `<tr><td colspan="4" class="text-center py-4">Yükleniyor...</td></tr>`;
 
-    let q = supabase.from('invoices').select('*').eq('owner_id', owner_id);
+  let q = supabase.from('invoices_v2').select('*').eq('owner_id', owner_id);
     if (start) q = q.gte('edit_date', start);
     if (end) q = q.lte('edit_date', end);
     q = q.order('edit_date', { ascending: false }).limit(1000);
@@ -178,20 +178,32 @@ export async function renderVatReportPanel() {
     setText('kpiCount', `Fatura adedi: ${data?.length || 0}`);
     setText('kpiAvgRate', `${avgRate.toFixed(2)}%`);
 
-    // Breakdown by tax rate (scan invoice items)
+    // Breakdown by tax rate using invoice_items_v2 within the same date range
     const byRate = {};
-    for (const inv of (data || [])) {
-      if (!Array.isArray(inv.items)) continue;
-      for (const it of inv.items) {
-        const rate = Number(it.tax || 0); // KDV % oranı
-        const matrah = Number((it.qty || 0) * (it.price || 0));
-        const kdv = matrah * (rate / 100);
-        const brut = matrah + kdv;
-        if (!byRate[rate]) byRate[rate] = { matrah:0, kdv:0, brut:0 };
-        byRate[rate].matrah += matrah;
-        byRate[rate].kdv += kdv;
-        byRate[rate].brut += brut;
+    try {
+      const invIds = (data || []).map(d => d.id);
+      if (invIds.length) {
+        let qi = supabase.from('invoice_items_v2')
+          .select('tax_rate, qty, unit_price')
+          .eq('owner_id', owner_id)
+          .in('invoice_id', invIds)
+          .limit(10000);
+        const { data: itemsData, error: itemsErr } = await qi;
+        if (!itemsErr && Array.isArray(itemsData)) {
+          for (const it of itemsData) {
+            const rate = Number(it.tax_rate || 0);
+            const matrah = Number((it.qty || 0) * (it.unit_price || 0));
+            const kdv = matrah * (rate / 100);
+            const brut = matrah + kdv;
+            if (!byRate[rate]) byRate[rate] = { matrah:0, kdv:0, brut:0 };
+            byRate[rate].matrah += matrah;
+            byRate[rate].kdv += kdv;
+            byRate[rate].brut += brut;
+          }
+        }
       }
+    } catch (e) {
+      console.warn('KDV dağılımı okunamadı', e?.message || e);
     }
     const rateKeys = Object.keys(byRate).sort((a,b)=>Number(a)-Number(b));
     if (!rateKeys.length) {

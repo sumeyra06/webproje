@@ -30,6 +30,29 @@ export async function renderUsersManagementPanel() {
         </table>
       </div>
       <div id="usersMsg" class="mt-2"></div>
+
+      <hr class="my-4"/>
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h4 class="mb-0">Müşteri Talepleri</h4>
+        <button id="refreshRequests" class="btn btn-sm btn-outline-secondary">Yenile</button>
+      </div>
+      <div class="small text-muted mb-2">Landing sayfasındaki iletişim formundan gelen talepler listelenir. Yalnızca adminler görür.</div>
+      <div id="requestsWrap" class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>Ad Soyad</th>
+              <th>Telefon</th>
+              <th>Mesaj</th>
+              <th>Durum</th>
+              <th>Tarih</th>
+            </tr>
+          </thead>
+          <tbody id="requestsTbody">
+            <tr><td colspan="5">Yükleniyor...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   `;
 
@@ -158,4 +181,46 @@ export async function renderUsersManagementPanel() {
 
   document.getElementById('refreshUsers').addEventListener('click', loadUsers);
   loadUsers();
+
+  async function loadRequests() {
+    const tbody = document.getElementById('requestsTbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="5">Yükleniyor...</td></tr>';
+    try {
+      const { data, error } = await supabase
+        .from('support_messages')
+        .select('id, user_full_name, user_phone, message, status, created_at, subject')
+        .eq('subject', 'customer_request')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      if (!data || !data.length) {
+        tbody.innerHTML = '<tr><td colspan="5">Talep yok.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(r => `
+        <tr>
+          <td>${r.user_full_name || '-'}</td>
+          <td>${r.user_phone || '-'}</td>
+          <td>${(r.message || '').replace(/</g,'&lt;')}</td>
+          <td>
+            <select class="form-select form-select-sm reqStatusSel" data-id="${r.id}">
+              ${['open','in-progress','closed'].map(s=>`<option value='${s}' ${r.status===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+          </td>
+          <td>${new Date(r.created_at).toLocaleString('tr-TR')}</td>
+        </tr>
+      `).join('');
+      document.querySelectorAll('.reqStatusSel').forEach(sel => sel.addEventListener('change', async (e) => {
+        const id = e.target.getAttribute('data-id');
+        const status = e.target.value;
+        const { error } = await supabase.from('support_messages').update({ status }).eq('id', id);
+        if (error) alert('Durum güncellenemedi: ' + error.message);
+      }));
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="5" class="text-danger">Liste yüklenemedi: ${err?.message||err}</td></tr>`;
+    }
+  }
+
+  document.getElementById('refreshRequests')?.addEventListener('click', loadRequests);
+  loadRequests();
 }
