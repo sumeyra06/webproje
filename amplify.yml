@@ -1,0 +1,79 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands: []
+    build:
+      # Static site: no build step required
+      commands: []
+  artifacts:
+    # Serve the repository root as the artifact
+    baseDirectory: .
+    files:
+      - '**/*'
+  cache:
+    paths: []
+  customHeaders:
+    items:
+      - pattern: '/assets/*'
+        headers:
+          - key: Cache-Control
+            value: public, max-age=31536000, immutable
+      - pattern: '/*'
+        headers:
+          - key: X-Content-Type-Options
+            value: nosniff
+          - key: X-Frame-Options
+            value: SAMEORIGIN
+          - key: Referrer-Policy
+            value: strict-origin-when-cross-origin
+          - key: Permissions-Policy
+            value: geolocation=(), microphone=(), camera=()
+          - key: Strict-Transport-Security
+            value: max-age=31536000; includeSubDomains; preload
+          - key: Content-Security-Policy
+            value: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.supabase.co; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://*; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://*.supabase.co; frame-ancestors 'self';
+redirects:
+  # Pretty URLs mapping (200 rewrites)
+  - source: /admin
+    target: /admin-panel.html
+    status: 200
+  - source: /login
+    target: /login.html
+    status: 200
+  - source: /signup
+    target: /signup.html
+    status: 200
+  - source: /user
+    target: /user-home.html
+    status: 200
+  - source: /support
+    target: /support.html
+    status: 200
+  - source: /gizlilik
+    target: /gizlilik.html
+    status: 200
+  - source: /hakkimizda
+    target: /hakkimizda.html
+    status: 200
+  - source: /iletisim
+    target: /iletisim.html
+    status: 200
+  - source: /referanslar
+    target: /referanslar.html
+    status: 200
+  - source: /xml-progress
+    target: /xml-progress.html
+    status: 200
+  - source: /kisisel-verileri-koruma
+    target: /kisisel-verileri-koruma.html
+    status: 200
+  - source: /bilgi-veri-guvenligi
+    target: /bilgi-veri-guvenligi.html
+    status: 200
+  - source: /hizmetler
+    target: /hizmetler.html
+    status: 200
+  - source: /urunler
+    target: /urunler.html
+    status: 200
