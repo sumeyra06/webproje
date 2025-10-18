@@ -788,35 +788,21 @@ nav a:hover::after {
     text-decoration: none;
     box-shadow: 0 2px 12px rgba(255,214,0,0.08);
     transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
-
-    /* Warehouses panel tweaks */
-    .warehouses-card .card {
-        border-radius: 12px;
-    }
-    .card.shadow-sm.h-100 { /* already used, make spacing nicer */
-        padding: 0.65rem;
-    }
-    .card .card-body .card-title {
-        font-size: 1.05rem;
-        font-weight: 700;
-    }
-    .dropdown-toggle .bi-three-dots-vertical {
-        font-size: 1rem;
-    }
-    .dropdown-menu .dropdown-item i {
-        font-size: 1rem;
-        vertical-align: middle;
-    }
-
-    /* Small responsive tweaks */
-    @media (max-width: 576px) {
-      .dropdown-toggle { padding: 0.25rem 0.5rem; }
-    }
     outline: none;
     display: inline-block;
     position: relative;
     overflow: hidden;
 }
+
+/* Warehouses panel tweaks (extracted from wrong nested block) */
+.warehouses-card .card { border-radius: 12px; }
+.card.shadow-sm.h-100 { /* already used, make spacing nicer */ padding: 0.65rem; }
+.card .card-body .card-title { font-size: 1.05rem; font-weight: 700; }
+.dropdown-toggle .bi-three-dots-vertical { font-size: 1rem; }
+.dropdown-menu .dropdown-item i { font-size: 1rem; vertical-align: middle; }
+
+/* Small responsive tweaks */
+@media (max-width: 576px) { .dropdown-toggle { padding: 0.25rem 0.5rem; } }
 .animated-btn:hover {
     transform: translateY(-2px) scale(1.04);
     box-shadow: 0 6px 24px rgba(255,111,0,0.13);
@@ -987,24 +973,14 @@ body.auth-page::after {
     }
 }
 @media (max-width: 700px) {
-    .container {
-        width: 99%;
+    .container { width: 99%; }
     /* Move CTAs into off-canvas menu on mobile */
     .nav-ctas { display: none; }
     .main-header.eleks-header nav .nav-cta-inline { display: block !important; margin-top: 12px; }
-    }
-    .eleks-hero-text h1 {
-        font-size: 2.1rem;
-    }
-    .section-title.eleks-section-title {
-        font-size: 1.3rem;
-    }
-    .eleks-service, .eleks-reference {
-        padding: 18px 10px;
-    }
-    .eleks-contact-form {
-        padding: 18px 8px;
-    }
+    .eleks-hero-text h1 { font-size: 2.1rem; }
+    .section-title.eleks-section-title { font-size: 1.3rem; }
+    .eleks-service, .eleks-reference { padding: 18px 10px; }
+    .eleks-contact-form { padding: 18px 8px; }
 }
 @media (max-width: 900px) {
     .hero-content {
