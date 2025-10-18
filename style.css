@@ -590,6 +590,17 @@ body {
 .brand-logo-img { height: 48px; width: auto; display: inline-block; vertical-align: middle; }
 .brand-logo--header { height: 50px; }
 @media (max-width: 900px) { .brand-logo--header { height: 40px; } }
+/* Larger header logo specifically on the landing (brand-bg) page */
+body.brand-bg .brand-logo-img {
+    height: 88px; /* larger desktop logo */
+    transition: height 0.2s ease;
+}
+@media (max-width: 1100px) {
+    body.brand-bg .brand-logo-img { height: 72px; }
+}
+@media (max-width: 700px) {
+    body.brand-bg .brand-logo-img { height: 48px; }
+}
 .brand-logo--auth { height: 46px; }
 .brand-logo--admin { height: 30px; }
 /* Keep brand logo original color (#f84343) on all backgrounds */
