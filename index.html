@@ -3,20 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="zmnPX1JCGBgythOnzpA2uOmmUWFNjZC1vMB-sGjX_10">
-    <title>AKSA YAZILIM | Ön Muhasebe</title>
+    <title>Ön Muhasebe Platformu</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
-    
 </head>
 <body class="brand-bg">
         <header class="main-header eleks-header">
     <div class="container nav-container">
             <div class="logo">
-                <img src="assets/aksa-logo.svg" alt="AKSA YAZILIM" class="brand-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-                <span class="eleks-logo brand-logo-fallback" aria-hidden="true" style="display:none;">
-                    <span class="eleks-brand-text">AKSA YAZILIM</span><span class="dot-square" aria-hidden="true"></span>
-                </span>
+                <img src="assets/softlogo-text.svg" alt="Logo" class="brand-logo-img brand-logo--header">
             </div>
             <button id="mobileNavToggle" class="mobile-nav-toggle" aria-label="Menüyü Aç/Kapat" title="Menü">
                 <i class="bi bi-list"></i>
@@ -43,7 +38,7 @@
         <section id="hero" class="landing-hero">
             <div class="container hero-container">
                 <div class="hero-text">
-                    <h1>AKSA YAZILIM Ön Muhasebe</h1>
+                    <h1>Ön Muhasebe Platformu</h1>
                     <p>Tekliften faturaya, cariden tahsilata, stoktan rapora<br/>işinizin tüm finans akışını tek yerden yönetin.</p>
                     <div class="hero-ctas">
                         <a href="login.html" class="eleks-btn">Ücretsiz Dene</a>
@@ -200,20 +195,28 @@
         </section>
 
         <!-- İLETİŞİM basit form -->
-        <section id="iletisim" class="contact eleks-contact">
+            <section id="iletisim" class="contact eleks-contact">
             <div class="container">
                 <h2 class="section-title eleks-section-title">Bizimle İletişime Geçin</h2>
-                <form class="contact-form eleks-contact-form">
-                    <input type="text" placeholder="Adınız Soyadınız" required>
-                    <input type="email" placeholder="E-posta Adresiniz" required>
-                    <textarea placeholder="Mesajınız..." required></textarea>
-                    <button type="submit" class="eleks-btn">Gönder</button>
-                </form>
+                                    <form id="contactForm" class="contact-form eleks-contact-form">
+                        <input id="cfFullName" type="text" placeholder="Adınız Soyadınız" required>
+                        <input id="cfPhone" type="tel" placeholder="Telefon Numaranız" required>
+                        <textarea id="cfMessage" placeholder="Mesajınız..." required></textarea>
+                        <button type="submit" class="eleks-btn">Gönder</button>
+                        <div id="cfMsg" class="small" style="margin-top:8px;"></div>
+                    </form>
+                                    <!-- Success overlay -->
+                                    <div id="cfSuccessOverlay" style="display:none; position: fixed; inset:0; background: rgba(0,0,0,0.45); z-index: 3000; align-items:center; justify-content:center;">
+                                        <div style="background:#fff; border-radius:16px; padding:28px 26px; max-width:420px; width:92%; text-align:center; box-shadow:0 12px 36px rgba(0,0,0,0.18);">
+                                            <div style="font-size:2.2rem; color:#16a34a; margin-bottom:8px;"><i class="bi bi-check-circle-fill"></i></div>
+                                            <h3 style="margin:0 0 6px 0; font-weight:900; letter-spacing:-0.3px;">Talebiniz Alındı</h3>
+                                            <p style="margin:0; color:#444;">En kısa sürede sizinle iletişime geçeceğiz.</p>
+                                        </div>
+                                    </div>
             </div>
         </section>
     <footer class="eleks-footer">
         <div class="container">
-            <div id="footerMediaImage" style="margin-bottom:18px;"></div>
             <div class="footer-policy-links">
                 <a href="kisisel-verileri-koruma.html" class="footer-policy-link">Kişisel Verileri Koruma</a>
                 <span class="footer-policy-sep">|</span>
@@ -221,12 +224,12 @@
                 <span class="footer-policy-sep">|</span>
                 <a href="gizlilik.html" class="footer-policy-link">Gizlilik</a>
             </div>
-            <p style="margin-top:12px;">&copy; 2025 Aksa Yazılım. Tüm hakları saklıdır.</p>
+            
         </div>
     </footer>
 <div id="cookieNotice" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.13);padding:24px 32px;z-index:3000;max-width:420px;width:96%;text-align:center;font-size:1.08rem;">
     Bu site, deneyiminizi iyileştirmek için çerezler kullanır. <button id="acceptCookiesBtn" style="background:linear-gradient(90deg,#ffd600 0%,#ff6f00 100%);color:#181818;border:none;border-radius:8px;padding:8px 22px;font-weight:700;font-size:1rem;cursor:pointer;margin-left:18px;">Kabul Et</button>
-    </div>
+</div>
 </body>
 <!-- Gereksiz slider ve ajans scriptleri kaldırıldı; sade landing için JS yok -->
 <script>
@@ -259,6 +262,48 @@ document.addEventListener('DOMContentLoaded', function() {
         if(e.key === 'Escape') document.body.classList.remove('nav-open');
     });
 })();
+</script>
+<script type="module">
+import { supabase } from './supabaseClient.js';
+document.getElementById('contactForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msgEl = document.getElementById('cfMsg');
+    msgEl.textContent = 'Gönderiliyor...';
+    msgEl.className = 'small';
+    try {
+        const full_name = document.getElementById('cfFullName').value.trim();
+        const phone = document.getElementById('cfPhone').value.trim();
+        const message = document.getElementById('cfMessage').value.trim();
+        if (!full_name || !phone || !message) {
+            msgEl.textContent = 'Lütfen tüm alanları doldurunuz.';
+            msgEl.className = 'small text-danger';
+            return;
+        }
+        // Anonymous customer request into support_messages
+        const payload = {
+            user_id: null,
+            user_full_name: full_name,
+            user_phone: phone,
+            subject: 'customer_request',
+            message: message,
+            status: 'open'
+        };
+        const { error } = await supabase.from('support_messages').insert([payload]);
+        if (error) throw error;
+            // Show sleek success overlay and reset the form
+            const ov = document.getElementById('cfSuccessOverlay');
+            if (ov) {
+                ov.style.display = 'flex';
+                setTimeout(()=> { ov.style.display = 'none'; }, 1800);
+            }
+            msgEl.textContent = '';
+            msgEl.className = 'small';
+            e.target.reset();
+    } catch (err) {
+        msgEl.textContent = 'Gönderilemedi: ' + (err?.message || err);
+        msgEl.className = 'small text-danger';
+    }
+});
 </script>
 <!-- Footer görsel yükleme kaldırıldı -->
 </html>
