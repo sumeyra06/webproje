@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ön Muhasebe Platformu</title>
+    <title>AKSA YAZILIM | Ön Muhasebe</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,7 +11,10 @@
         <header class="main-header eleks-header">
     <div class="container nav-container">
             <div class="logo">
-                <img src="assets/softlogo-text.svg" alt="Logo" class="brand-logo-img brand-logo--header">
+                <img src="assets/aksa-logo.svg" alt="AKSA YAZILIM" class="brand-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <span class="eleks-logo brand-logo-fallback" aria-hidden="true" style="display:none;">
+                    <span class="eleks-brand-text">AKSA YAZILIM</span><span class="dot-square" aria-hidden="true"></span>
+                </span>
             </div>
             <button id="mobileNavToggle" class="mobile-nav-toggle" aria-label="Menüyü Aç/Kapat" title="Menü">
                 <i class="bi bi-list"></i>
@@ -38,7 +41,7 @@
         <section id="hero" class="landing-hero">
             <div class="container hero-container">
                 <div class="hero-text">
-                    <h1>Ön Muhasebe Platformu</h1>
+                    <h1>AKSA YAZILIM Ön Muhasebe</h1>
                     <p>Tekliften faturaya, cariden tahsilata, stoktan rapora<br/>işinizin tüm finans akışını tek yerden yönetin.</p>
                     <div class="hero-ctas">
                         <a href="login.html" class="eleks-btn">Ücretsiz Dene</a>
@@ -195,20 +198,20 @@
         </section>
 
         <!-- İLETİŞİM basit form -->
-            <section id="iletisim" class="contact eleks-contact">
+        <section id="iletisim" class="contact eleks-contact">
             <div class="container">
                 <h2 class="section-title eleks-section-title">Bizimle İletişime Geçin</h2>
-                    <form id="contactForm" class="contact-form eleks-contact-form">
-                        <input id="cfFullName" type="text" placeholder="Adınız Soyadınız" required>
-                        <input id="cfPhone" type="tel" placeholder="Telefon Numaranız" required>
-                        <textarea id="cfMessage" placeholder="Mesajınız..." required></textarea>
-                        <button type="submit" class="eleks-btn">Gönder</button>
-                        <div id="cfMsg" class="small" style="margin-top:8px;"></div>
-                    </form>
+                <form class="contact-form eleks-contact-form">
+                    <input type="text" placeholder="Adınız Soyadınız" required>
+                    <input type="email" placeholder="E-posta Adresiniz" required>
+                    <textarea placeholder="Mesajınız..." required></textarea>
+                    <button type="submit" class="eleks-btn">Gönder</button>
+                </form>
             </div>
         </section>
     <footer class="eleks-footer">
         <div class="container">
+            <div id="footerMediaImage" style="margin-bottom:18px;"></div>
             <div class="footer-policy-links">
                 <a href="kisisel-verileri-koruma.html" class="footer-policy-link">Kişisel Verileri Koruma</a>
                 <span class="footer-policy-sep">|</span>
@@ -216,7 +219,7 @@
                 <span class="footer-policy-sep">|</span>
                 <a href="gizlilik.html" class="footer-policy-link">Gizlilik</a>
             </div>
-            
+            <p style="margin-top:12px;">&copy; 2025 Aksa Yazılım. Tüm hakları saklıdır.</p>
         </div>
     </footer>
 <div id="cookieNotice" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.13);padding:24px 32px;z-index:3000;max-width:420px;width:96%;text-align:center;font-size:1.08rem;">
