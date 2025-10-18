@@ -1,0 +1,46 @@
+/* Minimal Bootstrap subset to restore layout when CDN is unavailable.
+   This file intentionally contains only the essential layout/utilities
+   used by the landing page to avoid external CDN dependency.
+*/
+/* Reset and box-sizing */
+*, *::before, *::after { box-sizing: border-box; }
+html,body{height:100%;margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif}
+img{max-width:100%;height:auto;display:block}
+
+/* Container widths (simple responsive container) */
+.container{width:100%;padding-right:var(--bs-gutter-x,16px);padding-left:var(--bs-gutter-x,16px);margin-right:auto;margin-left:auto}
+@media (min-width:576px){.container{max-width:540px}}
+@media (min-width:768px){.container{max-width:720px}}
+@media (min-width:992px){.container{max-width:960px}}
+@media (min-width:1200px){.container{max-width:1140px}}
+
+/* Grid helpers (very small subset) */
+.row{display:flex;flex-wrap:wrap;margin-right:calc(var(--bs-gutter-x,16px) / -2);margin-left:calc(var(--bs-gutter-x,16px) / -2)}
+.col{flex:1 0 0%;min-width:0;padding-right:calc(var(--bs-gutter-x,16px) / 2);padding-left:calc(var(--bs-gutter-x,16px) / 2)}
+
+/* Utilities */
+.d-none{display:none!important}
+.text-center{text-align:center!important}
+.mb-0{margin-bottom:0!important}
+.mt-0{margin-top:0!important}
+
+/* Basic button look used by landing */
+.btn{display:inline-block;font-weight:600;color:#fff;background:#0d6efd;border:none;padding:.5rem 1rem;border-radius:.375rem;text-decoration:none}
+.btn:focus{outline:2px solid rgba(13,110,253,.25);outline-offset:2px}
+
+/* Simple responsive helpers used in layout */
+.hero-container{display:flex;align-items:center;gap:24px}
+@media (max-width:768px){.hero-container{flex-direction:column}}
+
+/* Nav basics used by header */
+.main-header{background:transparent;padding:18px 0}
+.nav-container{display:flex;align-items:center;justify-content:space-between}
+.nav-ctas a{margin-left:12px}
+
+/* Small helper for mockup placeholder */
+.app-mockup{background:#111;border-radius:8px;padding:12px;color:#fff}
+
+/* Footer spacing */
+.eleks-footer{padding:28px 0;background:transparent}
+
+/* Keep this file minimal; primary styles are in style.css */
