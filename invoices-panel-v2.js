@@ -337,19 +337,43 @@ async function openEditV2(id) {
   const owner = getCurrentUserId();
   const { data: inv, error } = await supabase.from('invoices_v2').select('*').eq('owner_id', owner).eq('id', id).single();
   if (error || !inv) return alert('Fatura bulunamadı');
-  // Debug: log raw totals and types to help diagnose prefilling issues
-  try { console.debug('openEditV2 - raw totals', { subtotal: inv.subtotal, tax_total: inv.tax_total, total: inv.total, types: [typeof inv.subtotal, typeof inv.tax_total, typeof inv.total] }); } catch (e) {}
-  // Fill header
-  document.getElementById('invId').value = inv.id;
-  document.getElementById('invName').value = inv.name || '';
-  document.getElementById('invNo').value = inv.invoice_no || '';
-  document.getElementById('invCategory').value = inv.category || '';
-  document.getElementById('invCustomer').value = inv.customer_name || '';
-  document.getElementById('invTags').value = Array.isArray(inv.tags) ? inv.tags.join(', ') : '';
-  document.getElementById('invCollect').value = inv.collection_status || 'pending';
-  document.getElementById('invEdit').value = inv.edit_date || new Date().toISOString().slice(0,10);
-  document.getElementById('invDue').value = inv.due_date || document.getElementById('invDue').value;
-  document.getElementById('invCurr').value = inv.currency || 'TRY';
+  // Debug: log invoice object for troubleshooting prefilling issues (use console.info so it's visible)
+  try { console.info('openEditV2 - invoice object', inv); } catch (e) {}
+  // Fill header with tolerant field mapping (support multiple DB column name variants)
+  const headerSet = {
+    id: inv.id,
+    name: firstOf(inv, ['name','invoice_name','title','label']) || '',
+    invoice_no: firstOf(inv, ['invoice_no','invoiceNo','no','number','invoice_number']) || '',
+    category: firstOf(inv, ['category','cat','type']) || '',
+    customer_name: firstOf(inv, ['customer_name','customer','customerFullName','buyer','customer_name_raw']) || '',
+    tags: firstOf(inv, ['tags','labels','etiketler']) || inv.tags || [],
+    collection_status: firstOf(inv, ['collection_status','status','state']) || 'pending',
+    edit_date: firstOf(inv, ['edit_date','date','created_at','updated_at']) || new Date().toISOString().slice(0,10),
+    due_date: firstOf(inv, ['due_date','vade','due']) || '',
+    currency: firstOf(inv, ['currency','curr']) || 'TRY',
+    stock_tracking_mode: firstOf(inv, ['stock_tracking_mode','stock_mode','stockMode']) || inv.stock_tracking_mode || null,
+  };
+  const invIdEl = document.getElementById('invId'); if (invIdEl) invIdEl.value = headerSet.id || '';
+  const setIf = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; else console.warn('openEditV2: missing element', id); };
+  setIf('invName', headerSet.name);
+  setIf('invNo', headerSet.invoice_no);
+  setIf('invCategory', headerSet.category);
+  setIf('invCustomer', headerSet.customer_name);
+  // tags may be array or comma string
+  const tagsVal = Array.isArray(headerSet.tags) ? headerSet.tags.join(', ') : (typeof headerSet.tags === 'string' ? headerSet.tags : '');
+  setIf('invTags', tagsVal);
+  setIf('invCollect', headerSet.collection_status || 'pending');
+  setIf('invEdit', headerSet.edit_date);
+  // keep existing value for invDue if fallback
+  const invDueEl = document.getElementById('invDue'); if (invDueEl) invDueEl.value = headerSet.due_date || invDueEl.value;
+  setIf('invCurr', headerSet.currency || 'TRY');
+  // Stock radios
+  try {
+    const yes = document.getElementById('stockOutYesV2');
+    const no = document.getElementById('stockOutNoV2');
+    if (headerSet.stock_tracking_mode === 'noout') { if (no) no.checked = true; else if (yes) yes.checked = false; }
+    else { if (yes) yes.checked = true; }
+  } catch (e) { console.warn('openEditV2 stock radio set failed', e); }
   // Stock tracking radios
   try {
     const yes = document.getElementById('stockOutYesV2');
@@ -361,92 +385,135 @@ async function openEditV2(id) {
   // Fill items
   const tbody = document.querySelector('#itemsTableV2 tbody');
   tbody.innerHTML = '';
-  const { data: items } = await supabase.from('invoice_items_v2').select('*').eq('owner_id', owner).eq('invoice_id', inv.id).order('sort_order', { ascending: true });
-  if (items?.length) {
-    for (const it of items) addRowV2(it);
+  // Primary fetch: items scoped to owner
+  const { data: items, error: itemsErr } = await supabase.from('invoice_items_v2').select('*').eq('owner_id', owner).eq('invoice_id', inv.id).order('sort_order', { ascending: true });
+  try { console.info('openEditV2 - invoice items from DB (scoped to owner)', items, 'err', itemsErr); } catch (e) {}
+  // expose last fetched objects for easier debugging in browser console
+  try { window.__LAST_OPEN_EDIT = { owner, invoiceId: inv.id, invoice: inv, items }; } catch (e) {}
+  if (items && Array.isArray(items) && items.length) {
+    for (const it of items) {
+      const payload = {
+        qty: firstOf(it, ['qty','quantity','miktar','adet','count','quantity_ordered','qty_ordered']) ?? it.qty ?? 0,
+        unit_price: firstOf(it, ['unit_price','price','unitPrice','net_price','price_net','brutFiyat','fiyat']) ?? it.unit_price ?? 0,
+        tax_rate: firstOf(it, ['tax_rate','vat_rate','kdv','kdv_orani','tax']) ?? it.tax_rate ?? 0,
+        unit: firstOf(it, ['unit','birim','uom']) || it.unit || 'Adet',
+        description: firstOf(it, ['description','desc','product_name','name','title']) || it.description || '',
+        product_id: it.product_id ?? it.productId ?? null,
+      };
+      payload.qty = parseNumberLoose(payload.qty);
+      payload.unit_price = parseNumberLoose(payload.unit_price);
+      payload.tax_rate = parseNumberLoose(payload.tax_rate);
+      addRowV2(payload);
+    }
   } else {
-    // Legacy import hint if possible
-    const box = document.createElement('div');
-    box.className = 'alert alert-warning d-flex justify-content-between align-items-center';
-    box.innerHTML = `<div>Bu faturanın kalemleri bulunamadı. Eski faturalar tablosundan (invoice_no ile) kalemleri içe aktarmayı deneyebilirsiniz.</div>
-      <button type='button' class='btn btn-sm btn-outline-secondary' id='importLegacyBtn'>Eski kalemleri içe aktar</button>`;
-    document.querySelector('#invoiceModalV2 .modal-body')?.prepend(box);
-    const btn = box.querySelector('#importLegacyBtn');
-    btn?.addEventListener('click', async () => {
-      try {
-        if (!inv.invoice_no) throw new Error('invoice_no yok');
-        const { data: legacy, error: errLegacy } = await supabase
-          .from('invoices')
-          .select('items')
-          .eq('owner_id', owner)
-          .eq('invoice_no', inv.invoice_no)
-          .single();
-        if (errLegacy || !legacy) throw errLegacy || new Error('Eski kayıt yok');
-  const parsed = parseLegacyItems(legacy.items);
-  try { console.debug('importLegacy - parsed items preview', parsed.slice ? parsed.slice(0,5) : parsed); } catch (e) {}
-        if (!Array.isArray(parsed) || !parsed.length) throw new Error('Eski kalemler boş');
-        const tbody = document.querySelector('#itemsTableV2 tbody');
-        tbody.innerHTML = '';
-        parsed.forEach((it) => {
-          // Broad alias list (mirror v1) and tolerant parsing/derivation
-          const qtyKeys = ['qty','quantity','miktar','adet','count','adet_sayisi','adetSayisi','sayi','quantityOrdered','qty_ordered','countQty'];
-          const priceKeys = ['price','unit_price','unitPrice','brutFiyat','fiyat','netFiyat','net_price','birim_fiyat','birimFiyat','price_net','priceNet','netAmount','unit_price_net','unitPriceNet','priceWithoutTax','unit_net'];
-          const taxKeys = ['tax','vat','vat_rate','kdv','kdv_orani','kdvOrani','tax_percent','taxPercent','taxRate','tax_rate_percent','kdvYuzde','kdv_oran','tax_rate'];
-          const descKeys = ['desc','description','aciklama','product_name','name','title','productName'];
-          const unitKeys = ['unit','birim','uom'];
-
-          let qty = parseNumberLoose(firstOf(it, qtyKeys));
-          let price = parseNumberLoose(firstOf(it, priceKeys));
-          let tax = parseNumberLoose(firstOf(it, taxKeys));
-          const unit = firstOf(it, unitKeys) || 'Adet';
-          const description = firstOf(it, descKeys) || '';
-
-          // Saved totals that may help derive missing values
-          const savedNet = parseNumberLoose(firstOf(it, ['lineTotal','line_total','satirToplam','total','netTotal','net_total','lineNet','line_amount_net','amount_net']));
-          const savedGross = parseNumberLoose(firstOf(it, ['grossTotal','totalWithTax','toplamKdvDahil','satirToplamKdvDahil','line_total_with_tax','total_gross','lineGross','amountWithTax','amount_with_tax']));
-
-          if (!Number.isFinite(qty)) qty = null;
-          if (!Number.isFinite(price)) price = null;
-          if (!Number.isFinite(tax)) tax = null;
-
-          // Derive missing price from saved totals and qty
-          if (!Number.isFinite(price)) {
-            const qBase = Number.isFinite(qty) ? qty : parseNumberLoose(firstOf(it, ['qty','quantity','miktar','adet']));
-            const qSafe = Number.isFinite(qBase) ? qBase : 0;
-            if (Number.isFinite(savedNet) && qSafe > 0) {
-              price = savedNet / qSafe;
-            } else if (Number.isFinite(savedGross) && qSafe > 0) {
-              if (Number.isFinite(tax)) price = savedGross / (qSafe * (1 + (tax/100)));
-              else price = savedGross / qSafe;
-            }
-          }
-          // Derive missing qty from saved totals and price
-          if ((!Number.isFinite(qty) || qty === null) && Number.isFinite(price) && price > 0) {
-            if (Number.isFinite(savedNet) && price > 0) {
-              qty = savedNet / price;
-            } else if (Number.isFinite(savedGross) && price > 0) {
-              const denom = Number.isFinite(tax) ? price * (1 + (tax/100)) : price;
-              if (denom > 0) qty = savedGross / denom;
-            }
-          }
-
-          // Final fallbacks
-          qty = Number.isFinite(qty) ? qty : 0;
-          price = Number.isFinite(price) ? price : 0;
-          tax = Number.isFinite(tax) ? tax : 0;
-
-          // If product_id present in legacy item, pass through
-          const payload = { qty, unit_price: price, tax_rate: tax, unit, description };
-          if (it.product_id) payload.product_id = it.product_id;
+    // If no items found with owner filter, attempt fallback fetch without owner (possible owner_id mismatch)
+    try {
+      const { data: itemsFallback, error: fallbackErr } = await supabase.from('invoice_items_v2').select('*').eq('invoice_id', inv.id).order('sort_order', { ascending: true });
+      try { console.info('openEditV2 - fallback invoice items (no owner filter)', itemsFallback, 'err', fallbackErr); } catch (e) {}
+      try { window.__LAST_OPEN_EDIT.fallbackItems = itemsFallback; } catch (e) {}
+      if (itemsFallback && Array.isArray(itemsFallback) && itemsFallback.length) {
+        for (const it of itemsFallback) {
+          const payload = {
+            qty: firstOf(it, ['qty','quantity','miktar','adet','count','quantity_ordered','qty_ordered']) ?? it.qty ?? 0,
+            unit_price: firstOf(it, ['unit_price','price','unitPrice','net_price','price_net','brutFiyat','fiyat']) ?? it.unit_price ?? 0,
+            tax_rate: firstOf(it, ['tax_rate','vat_rate','kdv','kdv_orani','tax']) ?? it.tax_rate ?? 0,
+            unit: firstOf(it, ['unit','birim','uom']) || it.unit || 'Adet',
+            description: firstOf(it, ['description','desc','product_name','name','title']) || it.description || '',
+            product_id: it.product_id ?? it.productId ?? null,
+          };
+          payload.qty = parseNumberLoose(payload.qty);
+          payload.unit_price = parseNumberLoose(payload.unit_price);
+          payload.tax_rate = parseNumberLoose(payload.tax_rate);
           addRowV2(payload);
-        });
-        recalcV2();
-        box.remove();
-      } catch (e) {
-        alert('İçe aktarma başarısız: ' + (e?.message||e));
+        }
+      } else {
+        // Try silent legacy import from `invoices` table using invoice_no (no UI prompt)
+        try {
+          if (inv.invoice_no) {
+            // use maybeSingle to avoid PostgREST error when no rows
+            const { data: legacy, error: errLegacy } = await supabase
+              .from('invoices')
+              .select('items')
+              .eq('owner_id', owner)
+              .eq('invoice_no', inv.invoice_no)
+              .maybeSingle();
+            try { console.info('openEditV2 - legacy items fetch (maybeSingle)', legacy, 'err', errLegacy); } catch (e) {}
+            const parsed = legacy && legacy.items ? parseLegacyItems(legacy.items) : [];
+            try { window.__LAST_OPEN_EDIT.legacyParsed = parsed; } catch (e) {}
+            if (Array.isArray(parsed) && parsed.length) {
+              // Map legacy items tolerant and add rows
+              for (const it of parsed) {
+                const qtyKeys = ['qty','quantity','miktar','adet','count','adet_sayisi','adetSayisi','sayi','quantityOrdered','qty_ordered','countQty'];
+                const priceKeys = ['price','unit_price','unitPrice','brutFiyat','fiyat','netFiyat','net_price','birim_fiyat','birimFiyat','price_net','priceNet','netAmount','unit_price_net','unitPriceNet','priceWithoutTax','unit_net'];
+                const taxKeys = ['tax','vat','vat_rate','kdv','kdv_orani','kdvOrani','tax_percent','taxPercent','taxRate','tax_rate_percent','kdvYuzde','kdv_oran','tax_rate'];
+                const descKeys = ['desc','description','aciklama','product_name','name','title','productName'];
+                const unitKeys = ['unit','birim','uom'];
+
+                let qty = parseNumberLoose(firstOf(it, qtyKeys));
+                let price = parseNumberLoose(firstOf(it, priceKeys));
+                let tax = parseNumberLoose(firstOf(it, taxKeys));
+                const unit = firstOf(it, unitKeys) || 'Adet';
+                const description = firstOf(it, descKeys) || '';
+
+                const savedNet = parseNumberLoose(firstOf(it, ['lineTotal','line_total','satirToplam','total','netTotal','net_total','lineNet','line_amount_net','amount_net']));
+                const savedGross = parseNumberLoose(firstOf(it, ['grossTotal','totalWithTax','toplamKdvDahil','satirToplamKdvDahil','line_total_with_tax','total_gross','lineGross','amountWithTax','amount_with_tax']));
+
+                if (!Number.isFinite(qty)) qty = null;
+                if (!Number.isFinite(price)) price = null;
+                if (!Number.isFinite(tax)) tax = null;
+
+                if (!Number.isFinite(price)) {
+                  const qBase = Number.isFinite(qty) ? qty : parseNumberLoose(firstOf(it, ['qty','quantity','miktar','adet']));
+                  const qSafe = Number.isFinite(qBase) ? qBase : 0;
+                  if (Number.isFinite(savedNet) && qSafe > 0) {
+                    price = savedNet / qSafe;
+                  } else if (Number.isFinite(savedGross) && qSafe > 0) {
+                    if (Number.isFinite(tax)) price = savedGross / (qSafe * (1 + (tax/100)));
+                    else price = savedGross / qSafe;
+                  }
+                }
+                if ((!Number.isFinite(qty) || qty === null) && Number.isFinite(price) && price > 0) {
+                  if (Number.isFinite(savedNet) && price > 0) {
+                    qty = savedNet / price;
+                  } else if (Number.isFinite(savedGross) && price > 0) {
+                    const denom = Number.isFinite(tax) ? price * (1 + (tax/100)) : price;
+                    if (denom > 0) qty = savedGross / denom;
+                  }
+                }
+
+                qty = Number.isFinite(qty) ? qty : 0;
+                price = Number.isFinite(price) ? price : 0;
+                tax = Number.isFinite(tax) ? tax : 0;
+
+                const payload = { qty, unit_price: price, tax_rate: tax, unit, description };
+                if (it.product_id) payload.product_id = it.product_id;
+                addRowV2(payload);
+              }
+              recalcV2();
+              try { console.info('openEditV2 - legacy items imported silently'); } catch (e) {}
+            } else {
+              // No items found anywhere: show a neutral info message and one empty row for editing
+              const modalBody = document.querySelector('#invoiceModalV2 .modal-body');
+              if (modalBody && !modalBody.querySelector('.no-items-info')) {
+                const info = document.createElement('div');
+                info.className = 'alert alert-info no-items-info';
+                info.textContent = 'Bu faturaya ait kayıtlı kalem bulunamadı. Yeni satır ekleyerek fatura içeriğini oluşturabilirsiniz.';
+                modalBody.prepend(info);
+              }
+              addRowV2();
+            }
+          } else {
+            addRowV2();
+          }
+        } catch (e) {
+          console.warn('openEditV2 - silent legacy import failed', e);
+          addRowV2();
+        }
       }
-    });
-    addRowV2();
+    } catch (e) {
+      console.warn('openEditV2 - fallback items fetch failed', e);
+      addRowV2();
+    }
   }
   // Prefill totals from DB: Postgres `numeric` often comes back as string, so parse loosely
   const subDb = parseNumberLoose(inv.subtotal);
@@ -495,7 +562,9 @@ async function onSubmitV2(e) {
   const items = [];
   let sub = 0, taxSum = 0;
   const itemsForStock = [];
-  document.querySelectorAll('#itemsTableV2 tbody tr').forEach((tr, idx) => {
+  const trs = Array.from(document.querySelectorAll('#itemsTableV2 tbody tr'));
+  for (let idx = 0; idx < trs.length; idx++) {
+    const tr = trs[idx];
     const qty = Number(tr.querySelector('.item-qty').value||0);
     const price = Number(tr.querySelector('.item-price').value||0);
     const tax = Number(tr.querySelector('.item-tax').value||0);
@@ -503,16 +572,62 @@ async function onSubmitV2(e) {
     const description = tr.querySelector('.item-desc').value || '';
     const line = qty*price; const ltax = line*(tax/100);
     sub += line; taxSum += ltax;
-    const product_id = tr.dataset.productId ? tr.dataset.productId : null;
+    const rawProductId = tr.dataset.productId ? String(tr.dataset.productId) : null;
+    // Attempt to resolve canonical product id from PRODUCTS_CACHE_V2 so we preserve the DB-side id type
+    let product_id = null;
+    if (rawProductId) {
+      if (!PRODUCTS_CACHE_V2) await preloadProductsV2();
+      const foundInCache = (PRODUCTS_CACHE_V2||[]).find(p => String(p.id) === rawProductId || String(p.code) === rawProductId);
+      if (foundInCache) {
+        product_id = foundInCache.id;
+      } else {
+        // fallback: if it's strictly numeric, use Number, otherwise keep as string (may match uuid)
+        product_id = /^\d+$/.test(rawProductId) ? Number(rawProductId) : rawProductId;
+      }
+    }
     items.push({ owner_id: owner, qty, unit_price: price, tax_rate: tax, unit, description, product_id, line_subtotal: line, line_tax: ltax, line_total: line+ltax, sort_order: idx });
-    if (product_id && stockMode === 'out' && qty > 0) itemsForStock.push({ product_id, qty });
-  });
+  if (product_id && stockMode === 'out' && qty > 0) itemsForStock.push({ product_id, qty, description, rawProductId });
+  }
   const payload = { ...payloadBase, subtotal: sub, tax_total: taxSum, total: sub + taxSum };
 
   // Pre-check stock before saving when mode is 'out'
+  let prevItemsForStock = [];
+  let netDiffs = [];
   if (stockMode === 'out' && itemsForStock.length) {
-    const ok = await precheckStockV2(itemsForStock);
-    if (!ok) return; // Abort save; user was alerted
+    if (id) {
+      // For updates, fetch previous items so we can check net requirements (new - old)
+      try {
+        const { data: prevItems, error: prevErr } = await supabase.from('invoice_items_v2').select('product_id, qty').eq('owner_id', owner).eq('invoice_id', id);
+        if (!prevErr && Array.isArray(prevItems)) {
+          prevItemsForStock = prevItems.map(p => ({ product_id: p.product_id, qty: Number(p.qty || 0) }));
+        }
+      } catch (e) {
+        console.warn('Could not fetch previous invoice items for stock delta', e);
+      }
+      // Compute net differences: newQty - prevQty per product id (can be positive or negative)
+      const needMap = new Map();
+      for (const it of itemsForStock) {
+        const key = String(it.product_id);
+        needMap.set(key, (needMap.get(key) || 0) + Number(it.qty || 0));
+      }
+      for (const p of prevItemsForStock) {
+        const key = String(p.product_id);
+        needMap.set(key, (needMap.get(key) || 0) - Number(p.qty || 0));
+      }
+      // Build arrays for precheck (only positive needs) and for actual apply (signed diffs)
+      const netNeeds = [];
+      netDiffs = [];
+      for (const [k, v] of needMap.entries()) {
+        const num = Number(v || 0);
+        if (num > 0) netNeeds.push({ product_id: k, qty: num });
+        if (num !== 0) netDiffs.push({ product_id: k, qty: num });
+      }
+      const ok = await precheckStockV2(netNeeds);
+      if (!ok) return; // Abort save; user was alerted
+    } else {
+      const ok = await precheckStockV2(itemsForStock);
+      if (!ok) return; // Abort save; user was alerted
+    }
   }
 
   let err = null, invId = id;
@@ -527,9 +642,46 @@ async function onSubmitV2(e) {
     }
     if (!err) {
       // Replace items: simplest correct approach
-      await supabase.from('invoice_items_v2').delete().eq('owner_id', owner).eq('invoice_id', id);
-      const rows = items.map(it => ({ ...it, invoice_id: Number(id) }));
-      if (rows.length) await supabase.from('invoice_items_v2').insert(rows);
+      const delRes = await supabase.from('invoice_items_v2').delete().eq('owner_id', owner).eq('invoice_id', id);
+      if (delRes.error) console.warn('invoice items delete error', delRes.error);
+      const rows = items.map(it => {
+        const { /*product_uuid,*/ ...rest } = it;
+        // sanitize product_id for DB: invoice_items_v2.product_id is bigint in schema
+        if (rest.product_id !== undefined && rest.product_id !== null) {
+          if (typeof rest.product_id === 'string') {
+            if (/^\d+$/.test(rest.product_id)) rest.product_id = Number(rest.product_id);
+            else rest.product_id = null;
+          } else if (typeof rest.product_id === 'number') {
+            // ok
+          } else {
+            rest.product_id = null;
+          }
+        }
+        return { ...rest, invoice_id: Number(id) };
+      });
+      if (rows.length) {
+        const ins = await supabase.from('invoice_items_v2').insert(rows);
+        if (ins.error) {
+          console.error('invoice_items_v2 insert error', ins.error, 'payload sample', rows[0]);
+          alert('Kalemler kaydedilemedi: ' + (ins.error.message || JSON.stringify(ins.error)));
+        }
+      }
+      // After replace, adjust stock based on net differences computed earlier
+      try {
+        if (stockMode === 'out') {
+          if (netDiffs && netDiffs.length) {
+            console.info('Updating stock for invoice update, netDiffs:', netDiffs);
+            const toDecrease = netDiffs.filter(d => Number(d.qty) > 0).map(d => ({ product_id: d.product_id, qty: Number(d.qty) }));
+            const toIncrease = netDiffs.filter(d => Number(d.qty) < 0).map(d => ({ product_id: d.product_id, qty: Math.abs(Number(d.qty)) }));
+            if (toDecrease.length) await applyStockOutV2(toDecrease);
+            if (toIncrease.length) await applyStockRestockV2(toIncrease);
+          } else if (itemsForStock && itemsForStock.length) {
+            // fallback: if netDiffs not computed, apply full out for new items
+            console.info('Updating stock for invoice update (fallback full out), itemsForStock:', itemsForStock);
+            await applyStockOutV2(itemsForStock);
+          }
+        }
+      } catch (se) { console.warn('Stock adjustment after update failed:', se?.message||se); }
     }
   } else {
     // INSERT with fallback if 'name' column missing in schema cache
@@ -547,15 +699,35 @@ async function onSubmitV2(e) {
       err = res.error; invId = res.data?.id;
     }
     if (!err && invId) {
-      const rows = items.map(it => ({ ...it, invoice_id: invId }));
-      if (rows.length) await supabase.from('invoice_items_v2').insert(rows);
+      const rows = items.map(it => {
+        const { /*product_uuid,*/ ...rest } = it;
+        if (rest.product_id !== undefined && rest.product_id !== null) {
+          if (typeof rest.product_id === 'string') {
+            if (/^\d+$/.test(rest.product_id)) rest.product_id = Number(rest.product_id);
+            else rest.product_id = null;
+          } else if (typeof rest.product_id === 'number') {
+            // ok
+          } else {
+            rest.product_id = null;
+          }
+        }
+        return { ...rest, invoice_id: invId };
+      });
+      if (rows.length) {
+        const ins = await supabase.from('invoice_items_v2').insert(rows);
+        if (ins.error) {
+          console.error('invoice_items_v2 insert error (create path)', ins.error, 'payload sample', rows[0]);
+          alert('Kalemler kaydedilemedi: ' + (ins.error.message || JSON.stringify(ins.error)));
+        }
+      }
+      // After create, apply stock out (new invoice)
+      try { if (stockMode === 'out' && itemsForStock.length) await applyStockOutV2(itemsForStock); } catch (se) { console.warn('Stock adjustment after create failed:', se?.message||se); }
     }
   }
 
   if (err) { alert('Kaydetme başarısız: '+err.message); return; }
 
-  // If stock mode is 'out', apply stock decrement
-  try { if (itemsForStock.length && stockMode === 'out') await applyStockOutV2(itemsForStock); } catch (se) { console.warn('Stok düşümü uyarı:', se?.message||se); }
+  // Stock updates are handled in the create/update branches (applyStockOutV2/applyStockRestockV2)
 
   bootstrap.Modal.getInstance(document.getElementById('invoiceModalV2')).hide();
   await loadInvoicesV2();
@@ -637,14 +809,41 @@ async function precheckStockV2(items) {
   }
   const ids = Array.from(need.keys());
   if (!ids.length) return true;
-  let q = supabase.from('products').select('id, name, stock').in('id', ids).eq('owner_id', getCurrentUserId());
-  let res = await q;
-  if (res.error) {
-    // Fallback without owner filter
-    res = await supabase.from('products').select('id, name, stock').in('id', ids);
+  // Try a bulk fetch; PostgREST may coerce types, but fall back to per-id lookups if necessary
+  let rows = [];
+  try {
+    let res = await supabase.from('products').select('id, name, stock').in('id', ids).eq('owner_id', getCurrentUserId());
+    if (res.error || !res.data || res.data.length === 0) {
+      // try without owner filter
+      res = await supabase.from('products').select('id, name, stock').in('id', ids);
+    }
+    if (!res.error && res.data) rows = res.data;
+  } catch (e) {
+    console.warn('bulk product lookup failed, will fallback to per-item lookup', e);
   }
-  if (res.error) { console.warn('Stok kontrolü okunamadı:', res.error?.message||res.error); return true; }
-  const rows = res.data || [];
+  // If bulk lookup returned nothing, try per-id queries (handles mixed types)
+  if (!rows || rows.length === 0) {
+    rows = [];
+    for (const id of ids) {
+      try {
+        let res = await supabase.from('products').select('id, name, stock').eq('id', id).eq('owner_id', getCurrentUserId()).maybeSingle();
+        if (!res || res.error || !res.data) {
+          // try numeric coercion
+          if (/^\d+$/.test(String(id))) {
+            res = await supabase.from('products').select('id, name, stock').eq('id', Number(id)).eq('owner_id', getCurrentUserId()).maybeSingle();
+            if (!res || res.error || !res.data) {
+              res = await supabase.from('products').select('id, name, stock').eq('id', Number(id)).maybeSingle();
+            }
+          } else {
+            res = await supabase.from('products').select('id, name, stock').eq('id', id).maybeSingle();
+          }
+        }
+        if (res && !res.error && res.data) rows.push(res.data);
+      } catch (e) {
+        console.warn('per-id product lookup failed for', id, e?.message||e);
+      }
+    }
+  }
   const insufficient = [];
   for (const id of ids) {
     const row = rows.find(r => String(r.id) === String(id));
@@ -663,14 +862,111 @@ async function precheckStockV2(items) {
 async function applyStockOutV2(items) {
   // Safe approach: read current stock and update
   for (const it of items) {
-    if (!it.product_id) continue;
+    const pid = it.product_id;
+    if (!pid) continue;
     try {
-      const { data: prod } = await supabase.from('products').select('stock').eq('id', it.product_id).eq('owner_id', getCurrentUserId()).single();
+      // Try finding product by id as-is; if not found try numeric coercion and ownerless fallback
+      let res = await supabase.from('products').select('id, stock').eq('id', pid).eq('owner_id', getCurrentUserId()).maybeSingle();
+      if ((!res || res.error || !res.data) && /^\d+$/.test(String(pid))) {
+        res = await supabase.from('products').select('id, stock').eq('id', Number(pid)).eq('owner_id', getCurrentUserId()).maybeSingle();
+      }
+      if ((!res || res.error || !res.data)) {
+        // final fallback: try without owner filter
+        res = await supabase.from('products').select('id, stock').eq('id', pid).maybeSingle();
+      }
+      let prod = res && res.data ? res.data : null;
+      // If not found in DB, try client-side cache lookup (handles cases where id was stored differently)
+      if (!prod) {
+        try {
+          if (!PRODUCTS_CACHE_V2) await preloadProductsV2();
+          const cache = PRODUCTS_CACHE_V2 || [];
+          const byId = cache.find(p => String(p.id) === String(pid));
+          const byCode = cache.find(p => String(p.code) === String(pid));
+          if (byId) prod = byId;
+          else if (byCode) prod = byCode;
+        } catch (e) {
+          // ignore cache lookup errors
+        }
+      }
+      // If still not found, and description exists, try resolving by description/name
+      if (!prod && it.description) {
+        try {
+          const resolved = await resolveProductV2(it.description);
+          if (resolved) prod = resolved;
+        } catch (e) {}
+      }
       const current = Number(prod?.stock || 0);
-      const next = Math.max(0, current - Number(it.qty||0));
-      await supabase.from('products').update({ stock: next }).eq('id', it.product_id).eq('owner_id', getCurrentUserId());
+      const qty = Number(it.qty || 0);
+      const next = Math.max(0, current - qty);
+      console.info('applyStockOutV2 - attempting update', { product_id: pid, prodId: prod?.id, current, qty, next });
+      if (!prod || !prod.id) {
+        console.warn('applyStockOutV2 - product not found, skipping', pid);
+        continue;
+      }
+      // Use .select to receive updated rows so we can inspect result
+      let upd = await supabase.from('products').update({ stock: next }).eq('id', prod.id).eq('owner_id', getCurrentUserId()).select('id,stock');
+      if (upd.error) console.warn('applyStockOutV2 update error (with owner filter)', upd.error);
+      const updatedRows = Array.isArray(upd.data) ? upd.data.length : 0;
+      // If update didn't affect rows, retry without owner filter
+      if (updatedRows === 0) {
+        const retry = await supabase.from('products').update({ stock: next }).eq('id', prod.id).select('id,stock');
+        if (retry.error) console.warn('applyStockOutV2 retry update error (no owner filter)', retry.error);
+        else if (Array.isArray(retry.data) && retry.data.length) console.info('applyStockOutV2 retry succeeded for', prod.id);
+        else console.warn('applyStockOutV2 retry did not update any rows for', prod.id);
+      } else {
+        console.info('applyStockOutV2 update affected rows', updatedRows, 'for', prod.id);
+      }
     } catch (e) {
       console.warn('Stock update failed for product', it.product_id, e?.message||e);
+    }
+  }
+}
+
+async function applyStockRestockV2(items) {
+  // Reverse of applyStockOutV2: increment stock by qty
+  for (const it of items) {
+    const pid = it.product_id;
+    if (!pid) continue;
+    try {
+      let res = await supabase.from('products').select('id, stock').eq('id', pid).eq('owner_id', getCurrentUserId()).maybeSingle();
+      if ((!res || res.error || !res.data) && /^\d+$/.test(String(pid))) {
+        res = await supabase.from('products').select('id, stock').eq('id', Number(pid)).eq('owner_id', getCurrentUserId()).maybeSingle();
+      }
+      if ((!res || res.error || !res.data)) {
+        res = await supabase.from('products').select('id, stock').eq('id', pid).maybeSingle();
+      }
+      let prod = res && res.data ? res.data : null;
+      if (!prod) {
+        try {
+          if (!PRODUCTS_CACHE_V2) await preloadProductsV2();
+          const cache = PRODUCTS_CACHE_V2 || [];
+          const byId = cache.find(p => String(p.id) === String(pid));
+          const byCode = cache.find(p => String(p.code) === String(pid));
+          if (byId) prod = byId;
+          else if (byCode) prod = byCode;
+        } catch (e) {}
+      }
+      const current = Number(prod?.stock || 0);
+      const qty = Number(it.qty || 0);
+      const next = Math.max(0, current + qty);
+      console.info('applyStockRestockV2 - attempting update', { product_id: pid, prodId: prod?.id, current, qty, next });
+      if (!prod || !prod.id) {
+        console.warn('applyStockRestockV2 - product not found, skipping', pid);
+        continue;
+      }
+      let upd = await supabase.from('products').update({ stock: next }).eq('id', prod.id).eq('owner_id', getCurrentUserId()).select('id,stock');
+      if (upd.error) console.warn('applyStockRestockV2 update error (with owner filter)', upd.error);
+      const updatedRows = Array.isArray(upd.data) ? upd.data.length : 0;
+      if (updatedRows === 0) {
+        const retry = await supabase.from('products').update({ stock: next }).eq('id', prod.id).select('id,stock');
+        if (retry.error) console.warn('applyStockRestockV2 retry update error (no owner filter)', retry.error);
+        else if (Array.isArray(retry.data) && retry.data.length) console.info('applyStockRestockV2 retry succeeded for', prod.id);
+        else console.warn('applyStockRestockV2 retry did not update any rows for', prod.id);
+      } else {
+        console.info('applyStockRestockV2 update affected rows', updatedRows, 'for', prod.id);
+      }
+    } catch (e) {
+      console.warn('Stock restock failed for product', it.product_id, e?.message||e);
     }
   }
 }
